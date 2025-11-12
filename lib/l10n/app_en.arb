@@ -1,0 +1,9 @@
+{
+  "@@locale": "en",
+  "appName": "Aerion Dashboard",
+  "@appName": {
+    "description": "Aerion Energy Dashboard Application"
+  },
+  "loginButton": "Sign In",
+  "@loginButton": {}
+}

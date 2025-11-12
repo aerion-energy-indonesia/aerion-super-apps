@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'app_state.dart';
 import 'features/dashboard/data/repositories/dashboard_repository_impl.dart';
-import 'features/dashboard/presentation/pages/dashboard_page.dart';
+import 'l10n/app_localizations.dart';
+import 'routes/app_router.dart';
+import 'themes/app_theme.dart';
 
 void main() {
   runApp(
@@ -17,10 +19,15 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Aerion Dashboard',
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
-      home: const DashboardPage(),
+      supportedLocales: const [Locale('en'), Locale('id')],
+      localizationsDelegates: const [AppLocalizations.delegate],
+      routerConfig: AppRouter.router,
     );
   }
 }

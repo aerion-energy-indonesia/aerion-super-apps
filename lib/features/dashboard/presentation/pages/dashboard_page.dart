@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../domain/entities/dashboard_item.dart';
 import '../../../../app_state.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -17,6 +18,101 @@ class _DashboardPageState extends State<DashboardPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AppState>().loadItems();
     });
+  }
+
+  Widget _buildItemCard(DashboardItem item) {
+    return Card(
+      color: Colors.white,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Colors.grey, width: 0.1),
+      ),
+      child: InkWell(
+        onTap: () {
+          // Logika navigasi atau aksi saat item diklik
+          print('Item ${item.subtitle} diklik');
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                height: 40,
+                alignment: Alignment.center,
+                // Menggunakan Icon dari CardItem
+                child: Image.asset(item.logoAsset, fit: BoxFit.contain),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                item.subtitle,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFF364153),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  fontFamily: 'Inter',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResponsiveList(BuildContext context, List<DashboardItem> items) {
+    // Tentukan lebar layar saat ini
+    final screenWidth = MediaQuery.of(context).size.width;
+    // Tentukan breakpoint (600px adalah breakpoint umum)
+    const breakpoint = 600.0;
+
+    // Jumlah kolom: 1 untuk layar kecil, 3 untuk layar besar
+    final int crossAxisCount = screenWidth > breakpoint ? 3 : 1;
+
+    if (items.isEmpty && !context.watch<AppState>().loading) {
+      return const Center(child: Text('Tidak ada item yang tersedia.'));
+    }
+
+    // Widget builder utama.
+    if (screenWidth > breakpoint) {
+      // Tampilan Grid untuk layar besar
+      return GridView.builder(
+        // Karena diletakkan di dalam SingleChildScrollView, kita harus:
+        shrinkWrap: true, // Membatasi ukuran GridView sesuai konten
+        physics:
+            const NeverScrollableScrollPhysics(), // Menonaktifkan scroll di GridView
+        itemCount: items.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount,
+          crossAxisSpacing: 16, // Jarak antar kolom
+          mainAxisSpacing: 16, // Jarak antar baris
+          childAspectRatio: 1.0, // Rasio aspek item (dapat disesuaikan)
+        ),
+        itemBuilder: (context, index) {
+          return _buildItemCard(items[index]);
+        },
+      );
+    } else {
+      // Tampilan List untuk layar kecil
+      return ListView.builder(
+        // Karena diletakkan di dalam SingleChildScrollView, kita harus:
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.only(
+              bottom: 16.0,
+            ), // Padding antar item List
+            child: _buildItemCard(items[index]),
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -103,60 +199,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const SizedBox(height: 24),
 
-                    ...state.items.map((item) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: Card(
-                          color: Colors.white,
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: const BorderSide(
-                              color: Colors.grey,
-                              width: 0.1,
-                            ),
-                          ),
-                          child: InkWell(
-                            onTap: () {
-                              print('Item ${item.subtitle} diklik');
-                            },
-                            borderRadius: BorderRadius.circular(12),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 24.0,
-                                horizontal: 16.0,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    height: 40,
-                                    alignment: Alignment.center,
-                                    child: Image.asset(
-                                      item.logoAsset,
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    item.subtitle,
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      color: Color(0xFF364153),
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 14,
-                                      fontFamily: 'Inter',
-                                      // Font bisa diubah jika Michroma adalah font yang tepat
-                                      // fontFamily: 'Michroma',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                    _buildResponsiveList(context, state.items),
                   ],
                 ),
               ),
