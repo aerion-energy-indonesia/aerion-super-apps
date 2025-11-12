@@ -22,7 +22,7 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
-    const bgColor = Colors.white;
+    const bgColor = Color(0xFFF4F4F5);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -35,11 +35,13 @@ class _DashboardPageState extends State<DashboardPage> {
                   horizontal: 24,
                 ),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Center(
-                      child: Column(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset(
                             'assets/images/icons/hres.png',
@@ -47,25 +49,37 @@ class _DashboardPageState extends State<DashboardPage> {
                             height: 80,
                             fit: BoxFit.contain,
                           ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'HRES',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                              fontFamily: 'GeistSemiBold',
+                          const SizedBox(width: 8),
+                          Container(
+                            margin: const EdgeInsets.only(
+                              left: 1.0,
+                              bottom: 10,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const [
+                                Text(
+                                  'HRES',
+                                  style: TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF364153),
+                                    fontFamily: 'Michroma',
+                                  ),
+                                ),
+                                Text(
+                                  'Super App',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.black,
+                                    fontFamily: 'Inter',
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const Text(
-                            'Super Apps',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.black54,
-                              fontFamily: 'GeistSemiBold',
-                            ),
-                          ),
-                          const SizedBox(height: 24),
+                          const SizedBox(width: 24),
                         ],
                       ),
                     ),
@@ -81,9 +95,9 @@ class _DashboardPageState extends State<DashboardPage> {
                       'Select Cluster Group',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 24,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: Color(0xFF364153),
                         fontFamily: 'GeistSemiBold',
                       ),
                     ),
@@ -128,7 +142,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                     item.subtitle,
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
-                                      color: Colors.black,
+                                      color: Color(0xFF364153),
+                                      fontWeight: FontWeight.w500,
                                       fontSize: 14,
                                       fontFamily: 'Inter',
                                       // Font bisa diubah jika Michroma adalah font yang tepat
