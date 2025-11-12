@@ -1,5 +1,5 @@
 name: aerion_dashboard
-description: "A new Flutter project."
+description: "Aeron Dashboard Mobile Application"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -34,6 +34,8 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  provider: ^6.1.5+1
+  http: ^1.6.0
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +79,35 @@ flutter:
     - family: Michroma
       fonts:
         - asset: fonts/Michroma-Regular.ttf
+    - family: GeistBold
+      fonts:
+        - asset: fonts/Geist-Black.ttf
+        - asset: fonts/Geist-Bold.ttf
+          weight: 700
+    - family: GeistMedium
+      fonts:
+        - asset: fonts/Geist-Medium.ttf
+          weight: 500
+    - family: GeistRegular
+      fonts:
+        - asset: fonts/Geist-Regular.ttf
+    - family: GeistSemiBold
+      fonts:
+        - asset: fonts/Geist-SemiBold.ttf
+          weight: 600
+    - family: Inter
+      fonts:
+        - asset: fonts/Inter-Italic-VariableFont_opsz,wght.ttf
+        - asset: fonts/Inter-VariableFont_opsz,wght.ttf
+          weight: 700
+  assets:
+        - assets/images/icons/aerion-icon.png
+        - assets/images/icons/aerion.png
+        - assets/images/icons/hres.png
+        - assets/images/icons/isuzu.png 
+        - assets/images/icons/pertamina.png
+        - assets/images/icons/telkom.png
+    
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
