@@ -1,15 +1,15 @@
-import '../../domain/entities/dashboard_item.dart';
+import '../../domain/entities/onboarding_item.dart';
 
-class DashboardItemModel extends DashboardItem {
-  DashboardItemModel({
+class OnboardingItemModel extends OnboardingItem {
+  OnboardingItemModel({
     required super.id,
     required super.title,
     required super.subtitle,
     required super.logoAsset,
   });
 
-  factory DashboardItemModel.fromJson(Map<String, dynamic> json) {
-    return DashboardItemModel(
+  factory OnboardingItemModel.fromJson(Map<String, dynamic> json) {
+    return OnboardingItemModel(
       id: json['id'] as String,
       title: json['title'] as String,
       subtitle: json['subtitle'] as String,

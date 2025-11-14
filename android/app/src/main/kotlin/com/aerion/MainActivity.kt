@@ -1,4 +1,4 @@
-package com.example.aerion_dashboard
+package com.aerion
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'app_state.dart';
-import 'features/dashboard/data/repositories/dashboard_repository_impl.dart';
+import 'features/onboarding/data/repositories/onboarding_repository_impl.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
 import 'routes/app_router.dart';
 import 'themes/app_theme.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     ChangeNotifierProvider(
       create: (_) => AppState(DashboardRepositoryImpl()),

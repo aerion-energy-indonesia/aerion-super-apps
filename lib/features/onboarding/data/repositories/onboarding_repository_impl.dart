@@ -1,11 +1,11 @@
 import 'dart:async';
-import '../../domain/entities/dashboard_item.dart';
-import '../../domain/repositories/dashboard_repository.dart';
-import '../models/dashboard_item_model.dart';
+import '../../domain/entities/onboarding_item.dart';
+import '../../domain/repositories/onboarding_repository.dart';
+import '../models/onboarding_item_model.dart';
 
-class DashboardRepositoryImpl implements DashboardRepository {
+class DashboardRepositoryImpl implements OnboardingRepository {
   @override
-  Future<List<DashboardItem>> fetchItems() async {
+  Future<List<OnboardingItem>> fetchItems() async {
     await Future.delayed(const Duration(milliseconds: 500)); // simulate network
     final data = [
       {
@@ -33,6 +33,6 @@ class DashboardRepositoryImpl implements DashboardRepository {
         'logoAsset': 'assets/images/icons/telkom.png',
       },
     ];
-    return data.map((e) => DashboardItemModel.fromJson(e)).toList();
+    return data.map((e) => OnboardingItemModel.fromJson(e)).toList();
   }
 }

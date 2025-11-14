@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
-import 'features/dashboard/domain/entities/dashboard_item.dart';
-import 'features/dashboard/domain/repositories/dashboard_repository.dart';
+import 'features/onboarding/domain/entities/onboarding_item.dart';
+import 'features/onboarding/domain/repositories/onboarding_repository.dart';
 
 class AppState extends ChangeNotifier {
-  final DashboardRepository repository;
+  final OnboardingRepository repository;
 
   AppState(this.repository);
 
-  List<DashboardItem> _items = [];
-  List<DashboardItem> get items => _items;
+  List<OnboardingItem> _items = [];
+  List<OnboardingItem> get items => _items;
 
   bool _loading = false;
   bool get loading => _loading;

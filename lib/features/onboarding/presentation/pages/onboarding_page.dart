@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../domain/entities/dashboard_item.dart';
+import '../../domain/entities/onboarding_item.dart';
 import '../../../../app_state.dart';
 
-class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key});
+class OnboardingPage extends StatefulWidget {
+  const OnboardingPage({super.key});
 
   @override
-  State<DashboardPage> createState() => _DashboardPageState();
+  State<OnboardingPage> createState() => _OnboardingPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
+class _OnboardingPageState extends State<OnboardingPage> {
   @override
   void initState() {
     super.initState();
@@ -20,7 +20,7 @@ class _DashboardPageState extends State<DashboardPage> {
     });
   }
 
-  Widget _buildItemCard(DashboardItem item) {
+  Widget _buildItemCard(OnboardingItem item) {
     return Card(
       color: Colors.white,
       elevation: 2,
@@ -64,7 +64,10 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildResponsiveList(BuildContext context, List<DashboardItem> items) {
+  Widget _buildResponsiveList(
+    BuildContext context,
+    List<OnboardingItem> items,
+  ) {
     // Tentukan lebar layar saat ini
     final screenWidth = MediaQuery.of(context).size.width;
     // Tentukan breakpoint (600px adalah breakpoint umum)

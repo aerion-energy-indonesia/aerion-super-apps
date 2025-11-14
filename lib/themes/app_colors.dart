@@ -24,4 +24,11 @@ class AppColors {
   static const Color error = Color(0xFFD32F2F); // Merah
   static const Color success = Color(0xFF388E3C); // Hijau
   static const Color warning = Color(0xFFFFA000); // Oranye
+
+  // 5. Border & Divider Colors
+  static const Color border = Color(0xFFE5E7EB); // Abu-abu Medium
+  static const Color divider = Color(0xFFE0E0E0); // Abu-abu Terang
+
+  // Button Colors
+  static const Color buttonBackground = Color(0xFF3F3F47);
 }

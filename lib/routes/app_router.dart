@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 // Import Pages dari fitur-fitur Anda (Presentation Layer)
-// import '../features/auth/presentation/pages/login_page.dart';
-import '../features/dashboard/presentation/pages/dashboard_page.dart';
+import '../features/auth/presentation/pages/login_page.dart';
+import '../features/onboarding/presentation/pages/onboarding_page.dart';
 // import '../features/auth/presentation/pages/user_profile_page.dart';
 import 'app_routes.dart';
 
@@ -15,19 +15,19 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     // Kunci navigator utama
     navigatorKey: _rootNavigatorKey,
-    initialLocation: AppRoutes.dashboard, // Rute awal
+    initialLocation: AppRoutes.login, // Rute awal
     // Konfigurasi semua rute dalam bentuk GoRoute
     routes: [
       // Rute Utama: Login Page
-      // GoRoute(
-      //   path: AppRoutes.login,
-      //   builder: (context, state) => const LoginPage(),
-      // ),
-
-      // Rute Utama: Dashboard Page
       GoRoute(
-        path: AppRoutes.dashboard,
-        builder: (context, state) => const DashboardPage(),
+        path: AppRoutes.login,
+        builder: (context, state) => const LoginPage(),
+      ),
+
+      // Rute Utama: onboarding Page
+      GoRoute(
+        path: AppRoutes.onboarding,
+        builder: (context, state) => const OnboardingPage(),
 
         // Contoh Sub-route (child route)
         routes: [
