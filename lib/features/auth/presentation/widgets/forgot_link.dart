@@ -15,11 +15,12 @@ class ForgotPasswordLink extends StatelessWidget {
         children: [
           // Bagian Teks Statis
           const Text(
-            'Forgot Password? ', // Tambahkan 1 spasi di sini
+            'Forgot Password ? ', // Tambahkan 1 spasi di sini
             style: TextStyle(
-              color: Color(0xFF3F3F47),
+              color: AppColors.textSecondary,
               fontFamily: 'GeistRegular',
               fontWeight: FontWeight.w500,
+              fontSize: 12,
             ),
           ),
 
@@ -63,7 +64,8 @@ class ForgotPasswordLink extends StatelessWidget {
               style: TextStyle(
                 color: Color(0xFF6A7282),
                 fontFamily: 'GeistSemiBold',
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
               ),
             ),
           ),

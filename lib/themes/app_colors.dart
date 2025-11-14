@@ -15,7 +15,7 @@ class AppColors {
 
   // 3. Text Colors
   static const Color textPrimary = Color(0xFF212121); // Hitam
-  static const Color textSecondary = Color(0xFF757575); // Abu-abu
+  static const Color textSecondary = Color(0xFF3F3F47); // Abu-abu
   static const Color textOnPrimary = Color(
     0xFFFFFFFF,
   ); // Putih (untuk di atas warna primary)

@@ -1,21 +1,16 @@
 import 'package:get_it/get_it.dart';
-// import 'package:flutter/foundation.dart'; // Untuk unit (Right(()))
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart'; // Hanya untuk konteks di sini, tapi provider tidak didaftarkan ke GetIt.
 
-// --- MOCK IMPORT (Ganti dengan import sebenarnya) ---
-// Lapisan Domain
-// import '../features/auth/domain/entities/auth_entity.dart';
-// import '../features/auth/domain/repositories/auth_repository.dart';
-// import '../features/auth/domain/usecases/sign_in_usecase.dart';
-
-// Lapisan Data
-// import '../features/auth/data/repositories/auth_repository_impl.dart';
-// Perlu Data Sources yang benar
-// import '../features/auth/data/repositories/auth_repository_impl.dart' show AuthRemoteDataSource, AuthRemoteDataSourceImpl;
-// Mock untuk unit (dartz) dan Failure
-// import '../features/auth/data/repositories/auth_repository_impl.dart' show ServerException, Failure, ServerFailure, UnknownFailure, UserModel, unit;
-
-// Lapisan Presentation (Provider/Bloc)
-// import '../features/auth/presentation/providers/auth_provider.dart';
+// --- Import Lapisan Auth ---
+// Domain
+import '../features/auth/domain/repositories/auth_repository.dart';
+import '../features/auth/domain/usecases/sign_in_usecase.dart';
+// Data
+import '../features/auth/data/datasources/auth_remote_datasource.dart';
+import '../features/auth/data/repositories/auth_repository_impl.dart';
+// Presentation
+import '../features/auth/presentation/providers/auth_notifier.dart';
 
 // --- Instansiasi Global GetIt ---
 final serviceLocator = GetIt.instance;
@@ -23,43 +18,48 @@ final serviceLocator = GetIt.instance;
 /// Fungsi untuk menginisialisasi semua dependensi aplikasi.
 Future<void> initDependencies() async {
   // =========================================================================
+  // 0. Eksternal / Core
+  // =========================================================================
+  // Mendaftarkan instansi FirebaseAuth sebagai Singleton
+  serviceLocator.registerLazySingleton(() => FirebaseAuth.instance);
+
+  // =========================================================================
   // 1. Feature: Auth (Autentikasi)
   // =========================================================================
 
   // Presentation Layer
-  // Kita mendaftarkan Provider/Bloc sebagai Factory atau LazySingleton
-  // serviceLocator.registerFactory(() => AuthProvider(
-  //       signInUseCase: serviceLocator(), // Membutuhkan UseCase
-  // ));
+  // Kita daftarkan AuthNotifier sebagai Factory.
+  // Catatan: Provider (ChangeNotifier) biasanya didaftarkan sebagai Factory
+  // atau Prototype agar setiap widget Provider.of memiliki instance baru.
+  serviceLocator.registerFactory(
+    () => AuthNotifier(
+      serviceLocator(), // Membutuhkan SignInUsecase
+    ),
+  );
 
   // Domain Layer - Use Cases
-  // serviceLocator.registerLazySingleton(
-  //   () => SignInUseCase(serviceLocator()), // Membutuhkan AuthRepository
-  // );
+  serviceLocator.registerLazySingleton(
+    () => SignInUsecase(serviceLocator()), // Membutuhkan AuthRepository
+  );
 
   // Domain Layer - Repository Contracts (Interface)
-  // Mendaftarkan implementasi konkret sebagai LazySingleton untuk Repository
-  // serviceLocator.registerLazySingleton<AuthRepository>(
-  //   () => AuthRepositoryImpl(remoteDataSource: serviceLocator()), // Membutuhkan AuthRemoteDataSource
-  // );
+  // Mendaftarkan implementasi konkret sebagai LazySingleton
+  serviceLocator.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(
+      serviceLocator(),
+    ), // Membutuhkan AuthRemoteDataSource
+  );
 
   // Data Layer - Data Sources
   // Mendaftarkan implementasi Data Source sebagai LazySingleton
-  // serviceLocator.registerLazySingleton<AuthRemoteDataSource>(
-  //   () => AuthRemoteDataSourceImpl(),
-  // );
+  serviceLocator.registerLazySingleton<AuthRemoteDataSource>(
+    () =>
+        AuthRemoteDataSourceImpl(serviceLocator()), // Membutuhkan FirebaseAuth
+  );
 
   // =========================================================================
   // 2. Core (Utilitas Bersama)
   // =========================================================================
 
-  // Core Utilities (Contoh: Shared Preferences, Dio Client, dll.)
-  // serviceLocator.registerLazySingleton(() => DioClient(serviceLocator()));
-  // serviceLocator.registerLazySingleton(() => NetworkInfo(serviceLocator()));
-
-  // Misalnya, mendaftarkan koneksi database jika diperlukan
-  // final sharedPreferences = await SharedPreferences.getInstance();
-  // serviceLocator.registerLazySingleton(() => sharedPreferences);
-
-  // ... Tambahkan dependensi untuk fitur lain di sini (Dashboard, Settings, dll.)
+  // ... Anda bisa menambahkan Core utilities seperti NetworkInfo di sini
 }

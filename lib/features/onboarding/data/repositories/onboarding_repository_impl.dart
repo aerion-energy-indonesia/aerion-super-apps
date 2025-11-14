@@ -3,7 +3,7 @@ import '../../domain/entities/onboarding_item.dart';
 import '../../domain/repositories/onboarding_repository.dart';
 import '../models/onboarding_item_model.dart';
 
-class DashboardRepositoryImpl implements OnboardingRepository {
+class OnboardingRepositoryImpl implements OnboardingRepository {
   @override
   Future<List<OnboardingItem>> fetchItems() async {
     await Future.delayed(const Duration(milliseconds: 500)); // simulate network
