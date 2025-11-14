@@ -10,6 +10,7 @@ import 'firebase_options.dart';
 import 'features/auth/data/datasources/auth_remote_datasource.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/domain/usecases/sign_in_usecase.dart';
+import 'features/auth/domain/usecases/reset_password_usecase.dart';
 import 'features/auth/presentation/providers/auth_notifier.dart';
 // --- Komponen Lain ---
 import 'l10n/app_localizations.dart';
@@ -27,6 +28,7 @@ void main() async {
   final authRemoteDataSource = AuthRemoteDataSourceImpl(firebaseAuthInstance);
   final authRepository = AuthRepositoryImpl(authRemoteDataSource);
   final signInUsecase = SignInUsecase(authRepository);
+  final resetPasswordUsecase = ResetPasswordUsecase(authRepository);
   // --- End DI Auth ---
 
   runApp(
@@ -38,7 +40,9 @@ void main() async {
           create: (_) => AppState(OnboardingRepositoryImpl()),
         ),
         // 2. Provider untuk AuthNotifier (Firebase Auth)
-        ChangeNotifierProvider(create: (_) => AuthNotifier(signInUsecase)),
+        ChangeNotifierProvider(
+          create: (_) => AuthNotifier(signInUsecase, resetPasswordUsecase),
+        ),
       ],
       child: const MyApp(),
     ),

@@ -1,21 +1,20 @@
+import 'package:flutter/material.dart';
 import 'package:aerion_dashboard/features/auth/presentation/widgets/button.dart';
 import 'package:aerion_dashboard/features/auth/presentation/widgets/text_link.dart';
 import 'package:aerion_dashboard/features/auth/presentation/widgets/form_field.dart';
 import 'package:aerion_dashboard/features/auth/presentation/providers/auth_notifier.dart';
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class ForgotPasswordPage extends StatefulWidget {
+  const ForgotPasswordPage({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   late VoidCallback _listener;
@@ -41,10 +40,17 @@ class _LoginPageState extends State<LoginPage> {
         });
       }
 
-      // Cek sukses untuk navigasi
-      if (authState.user != null && authState.error == null) {
+      // Cek jika reset password berhasil
+      if (!authState.isLoading && authState.error == null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.go('/onboarding');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Password reset link has been sent to your email.'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          // Kembali ke halaman login setelah reset password berhasil
+          context.go('/login');
         });
       }
     };
@@ -57,17 +63,13 @@ class _LoginPageState extends State<LoginPage> {
   void dispose() {
     context.read<AuthNotifier>().removeListener(_listener);
     _emailController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
-  void _login() {
+  void _resetPassword() {
     if (_formKey.currentState!.validate()) {
       // Memanggil method signIn dari Notifier menggunakan context.read
-      context.read<AuthNotifier>().signIn(
-        _emailController.text.trim(),
-        _passwordController.text,
-      );
+      context.read<AuthNotifier>().resetPassword(_emailController.text.trim());
     }
   }
 
@@ -132,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Login',
+                    'Forgot Password',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
@@ -150,8 +152,8 @@ class _LoginPageState extends State<LoginPage> {
                       // use form field widget
                       FormFieldWidget(
                         controller: _emailController,
-                        label: 'Username or Email',
-                        hintText: 'Input your username or email',
+                        label: 'Email',
+                        hintText: 'Input your email',
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your email';
@@ -160,33 +162,20 @@ class _LoginPageState extends State<LoginPage> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      // use form field widget
-                      FormFieldWidget(
-                        controller: _passwordController,
-                        label: 'Password',
-                        hintText: 'Input your password',
-                        isPassword: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 10),
                       // forget password text button
                       TextLink(
-                        label: 'Forgot password ? ',
-                        linkLabel: 'Click Here',
+                        label: 'Remember your password ? ',
+                        linkLabel: 'Login',
                         onPressed: () {
-                          context.go('/forgot-password');
+                          // Handle forgot password action
+                          context.go('/login');
                         },
                       ),
                       const SizedBox(height: 32),
                       // use button widget
                       LoginButton(
-                        label: 'Login',
-                        onPressed: _login,
+                        label: 'Reset Password',
+                        onPressed: _resetPassword,
                         isLoading: authState.isLoading,
                       ),
                     ],

@@ -8,4 +8,6 @@ abstract class AuthRepository {
     String email,
     String password,
   );
+
+  Future<Either<AuthFailure, Unit>> resetPassword(String email);
 }

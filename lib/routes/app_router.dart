@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 // Import Pages dari fitur-fitur Anda (Presentation Layer)
-import '../features/auth/presentation/pages/login_page.dart';
-import '../features/onboarding/presentation/pages/onboarding_page.dart';
+import 'package:aerion_dashboard/features/auth/presentation/pages/login_page.dart';
+import 'package:aerion_dashboard/features/onboarding/presentation/pages/onboarding_page.dart';
+import 'package:aerion_dashboard/features/auth/presentation/pages/forgot_password_page.dart';
 // import '../features/auth/presentation/pages/user_profile_page.dart';
 import 'app_routes.dart';
 
@@ -22,6 +23,11 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.login,
         builder: (context, state) => const LoginPage(),
+      ),
+
+      GoRoute(
+        path: AppRoutes.forgotPassword,
+        builder: (context, state) => const ForgotPasswordPage(),
       ),
 
       // Rute Utama: onboarding Page

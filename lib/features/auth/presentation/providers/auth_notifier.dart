@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../domain/entities/auth_entity.dart';
-import '../../domain/usecases/sign_in_usecase.dart';
+import 'package:aerion_dashboard/features/auth/domain/usecases/reset_password_usecase.dart';
+import 'package:aerion_dashboard/features/auth/domain/entities/auth_entity.dart';
+import 'package:aerion_dashboard/features/auth/domain/usecases/sign_in_usecase.dart';
 
 // Definisi State yang akan di-expose
 class AuthState {
@@ -27,8 +28,9 @@ class AuthState {
 // AuthNotifier menggunakan ChangeNotifier untuk State Management
 class AuthNotifier extends ChangeNotifier {
   final SignInUsecase signInUsecase;
+  final ResetPasswordUsecase resetPasswordUsecase;
 
-  AuthNotifier(this.signInUsecase);
+  AuthNotifier(this.signInUsecase, this.resetPasswordUsecase);
 
   // State Internal
   AuthState _state = AuthState();
@@ -61,6 +63,23 @@ class AuthNotifier extends ChangeNotifier {
   // Fungsi untuk mereset error setelah ditampilkan
   void resetError() {
     _state = _state.copyWith(clearError: true);
+    notifyListeners();
+  }
+
+  // Fungsi untuk reset password
+  Future<void> resetPassword(String email) async {
+    _state = _state.copyWith(isLoading: true, error: null);
+    notifyListeners();
+
+    final result = await resetPasswordUsecase.call(email);
+    result.fold(
+      (failure) {
+        _state = _state.copyWith(isLoading: false, error: failure);
+      },
+      (_) {
+        _state = _state.copyWith(isLoading: false, error: null);
+      },
+    );
     notifyListeners();
   }
 }

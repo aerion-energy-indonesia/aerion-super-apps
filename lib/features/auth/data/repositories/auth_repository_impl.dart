@@ -41,4 +41,24 @@ class AuthRepositoryImpl implements AuthRepository {
       return const Left('Could not connect to the server.');
     }
   }
+
+  @override
+  Future<Either<AuthFailure, Unit>> resetPassword(String email) async {
+    try {
+      await remoteDataSource.resetPassword(email);
+      return const Right(unit);
+    } on FirebaseAuthException catch (e) {
+      String errorMessage;
+      if (e.code == 'user-not-found') {
+        errorMessage = 'No user found for that email.';
+      } else if (e.code == 'invalid-email') {
+        errorMessage = 'The email address is not valid.';
+      } else {
+        errorMessage = 'An unknown error occurred during password reset.';
+      }
+      return Left(errorMessage);
+    } on Exception catch (_) {
+      return const Left('Could not connect to the server.');
+    }
+  }
 }
