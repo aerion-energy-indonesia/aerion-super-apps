@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../themes/app_colors.dart';
+import 'package:aerion_dashboard/themes/app_colors.dart';
 
 class LoginButton extends StatelessWidget {
   final String label;
@@ -7,11 +7,11 @@ class LoginButton extends StatelessWidget {
   final bool isLoading;
 
   const LoginButton({
-    Key? key,
+    super.key,
     required this.label,
     required this.onPressed,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

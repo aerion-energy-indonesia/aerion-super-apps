@@ -34,6 +34,7 @@ Future<void> initDependencies() async {
     () => AuthNotifier(
       serviceLocator(), // Membutuhkan SignInUsecase
       serviceLocator(), // Membutuhkan ResetPasswordUsecase
+      serviceLocator(), // Membutuhkan SignOutUsecase
     ),
   );
 

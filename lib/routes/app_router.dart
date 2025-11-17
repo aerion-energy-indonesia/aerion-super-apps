@@ -1,23 +1,58 @@
-// lib/routes/app_router.dart
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart'; // <<< Import Provider
 
-// Import Pages dari fitur-fitur Anda (Presentation Layer)
+// Import Pages dan Notifier Anda
 import 'package:aerion_dashboard/features/auth/presentation/pages/login_page.dart';
 import 'package:aerion_dashboard/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:aerion_dashboard/features/auth/presentation/pages/forgot_password_page.dart';
-// import '../features/auth/presentation/pages/user_profile_page.dart';
+import 'package:aerion_dashboard/features/cluster/presentation/pages/cluster_page.dart';
+import 'package:aerion_dashboard/features/dashboard/presentation/pages/dashboard_page.dart';
+import 'package:aerion_dashboard/features/profile/presentation/pages/profile_page.dart';
+import '../features/auth/presentation/providers/auth_notifier.dart';
 import 'app_routes.dart';
 
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
   static final GoRouter router = GoRouter(
-    // Kunci navigator utama
     navigatorKey: _rootNavigatorKey,
-    initialLocation: AppRoutes.login, // Rute awal
-    // Konfigurasi semua rute dalam bentuk GoRoute
+    initialLocation: AppRoutes.login,
+
+    // =========================================================================
+    // IMPLEMENTASI REDIRECT/AUTH GUARD
+    // =========================================================================
+    redirect: (BuildContext context, GoRouterState state) {
+      // Akses AuthState dari Provider tanpa mendengarkan perubahannya
+      final authState = Provider.of<AuthNotifier>(context, listen: false).state;
+      final bool isLoggedIn = authState.user != null;
+
+      // Path yang sedang dituju pengguna
+      final String goingTo = state.matchedLocation;
+
+      // Apakah pengguna mencoba mengakses halaman Login/Forgot Password?
+      final bool isAuthPage =
+          goingTo == AppRoutes.login || goingTo == AppRoutes.forgotPassword;
+
+      // 1. SKENARIO: Sudah Login, tapi mencoba mengakses halaman Login/Auth.
+      if (isLoggedIn && isAuthPage) {
+        // Redirect ke halaman utama (Onboarding atau Dashboard)
+        // Kita gunakan Onboarding sebagai tujuan default setelah login
+        return AppRoutes.onboarding;
+      }
+
+      // 2. SKENARIO: Belum Login, tapi mencoba mengakses halaman yang dilindungi.
+      // Kita asumsikan semua halaman selain Login/Forgot adalah halaman yang dilindungi.
+      if (!isLoggedIn && !isAuthPage) {
+        // Redirect kembali ke halaman Login
+        return AppRoutes.login;
+      }
+
+      // 3. SKENARIO: Tidak perlu redirect (tetap di halaman yang dituju)
+      return null;
+    },
+
+    // =========================================================================
     routes: [
       // Rute Utama: Login Page
       GoRoute(
@@ -30,18 +65,27 @@ class AppRouter {
         builder: (context, state) => const ForgotPasswordPage(),
       ),
 
-      // Rute Utama: onboarding Page
+      // Rute Utama: Onboarding Page (Target setelah login)
       GoRoute(
         path: AppRoutes.onboarding,
         builder: (context, state) => const OnboardingPage(),
+      ),
 
-        // Contoh Sub-route (child route)
+      GoRoute(
+        path: AppRoutes.cluster,
+        builder: (context, state) => const ClusterPage(),
+      ),
+
+      // Rute Utama: Dashboard Page
+      GoRoute(
+        path: AppRoutes.dashboard,
+        builder: (context, state) => const DashboardPage(),
         routes: [
-          // GoRoute(
-          //   // Path menjadi '/dashboard/profile'
-          //   path: AppRoutes.profile,
-          //   builder: (context, state) => const UserProfilePage(),
-          // ),
+          GoRoute(
+            // Path menjadi '/dashboard/profile'
+            path: AppRoutes.profile,
+            builder: (context, state) => const ProfilePage(),
+          ),
         ],
       ),
     ],

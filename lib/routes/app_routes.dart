@@ -6,5 +6,7 @@ class AppRoutes {
   static const String login = '/login';
   static const String forgotPassword = '/forgot-password';
   static const String onboarding = '/onboarding';
+  static const String cluster = '/cluster';
+  static const String dashboard = '/dashboard';
   static const String profile = 'profile'; // Sub-route
 }

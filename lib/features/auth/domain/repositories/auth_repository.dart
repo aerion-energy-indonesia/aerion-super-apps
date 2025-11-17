@@ -9,5 +9,9 @@ abstract class AuthRepository {
     String password,
   );
 
+  Future<Either<AuthFailure, AuthEntity?>> getCurrentUser();
+
   Future<Either<AuthFailure, Unit>> resetPassword(String email);
+
+  Future<Either<AuthFailure, Unit>> signOut();
 }

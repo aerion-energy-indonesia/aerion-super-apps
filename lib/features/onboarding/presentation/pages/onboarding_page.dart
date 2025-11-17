@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../domain/entities/onboarding_item.dart';
-import '../../../../app_state.dart';
+import 'package:aerion_dashboard/features/onboarding/domain/entities/onboarding_item.dart';
+import 'package:aerion_dashboard/app_state.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -31,7 +32,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       child: InkWell(
         onTap: () {
           // Logika navigasi atau aksi saat item diklik
-          print('Item ${item.subtitle} diklik');
+          context.go('/cluster');
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(

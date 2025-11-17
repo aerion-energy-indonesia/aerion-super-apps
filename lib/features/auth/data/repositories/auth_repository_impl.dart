@@ -61,4 +61,27 @@ class AuthRepositoryImpl implements AuthRepository {
       return const Left('Could not connect to the server.');
     }
   }
+
+  @override
+  Future<Either<AuthFailure, Unit>> signOut() async {
+    try {
+      await remoteDataSource.signOut();
+      return const Right(unit);
+    } on Exception catch (_) {
+      return const Left('Could not connect to the server.');
+    }
+  }
+
+  @override
+  Future<Either<AuthFailure, AuthEntity>> getCurrentUser() async {
+    try {
+      final userEntity = await remoteDataSource.getCurrentUser();
+      if (userEntity == null) {
+        return const Left('Could not retrieve current user.');
+      }
+      return Right(userEntity);
+    } on Exception catch (_) {
+      return const Left('Could not retrieve current user.');
+    }
+  }
 }

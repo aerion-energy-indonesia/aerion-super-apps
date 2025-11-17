@@ -1,3 +1,4 @@
+import 'package:aerion_dashboard/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:aerion_dashboard/features/auth/domain/usecases/reset_password_usecase.dart';
 import 'package:aerion_dashboard/features/auth/domain/entities/auth_entity.dart';
@@ -8,19 +9,27 @@ class AuthState {
   final bool isLoading;
   final AuthEntity? user;
   final String? error;
+  final bool isSigningOut;
 
-  AuthState({this.isLoading = false, this.user, this.error});
+  AuthState({
+    this.isLoading = false,
+    this.user,
+    this.error,
+    this.isSigningOut = false,
+  });
 
   AuthState copyWith({
     bool? isLoading,
     AuthEntity? user,
     String? error,
     bool clearError = false,
+    bool? isSigningOut,
   }) {
     return AuthState(
       isLoading: isLoading ?? this.isLoading,
       user: user ?? this.user,
       error: clearError ? null : error ?? this.error,
+      isSigningOut: isSigningOut ?? this.isSigningOut,
     );
   }
 }
@@ -29,8 +38,13 @@ class AuthState {
 class AuthNotifier extends ChangeNotifier {
   final SignInUsecase signInUsecase;
   final ResetPasswordUsecase resetPasswordUsecase;
+  final SignOutUsecase signOutUsecase;
 
-  AuthNotifier(this.signInUsecase, this.resetPasswordUsecase);
+  AuthNotifier(
+    this.signInUsecase,
+    this.resetPasswordUsecase,
+    this.signOutUsecase,
+  );
 
   // State Internal
   AuthState _state = AuthState();
@@ -78,6 +92,23 @@ class AuthNotifier extends ChangeNotifier {
       },
       (_) {
         _state = _state.copyWith(isLoading: false, error: null);
+      },
+    );
+    notifyListeners();
+  }
+
+  // Fungsi untuk sign out
+  Future<void> signOut() async {
+    _state = _state.copyWith(isSigningOut: true, error: null);
+    notifyListeners();
+
+    final result = await signOutUsecase.call();
+    result.fold(
+      (failure) {
+        _state = _state.copyWith(isSigningOut: false, error: failure);
+      },
+      (_) {
+        _state = AuthState(); // Reset state setelah sign out
       },
     );
     notifyListeners();

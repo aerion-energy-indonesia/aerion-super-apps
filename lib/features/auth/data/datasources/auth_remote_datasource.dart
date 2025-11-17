@@ -4,6 +4,8 @@ import '../../domain/entities/auth_entity.dart';
 abstract class AuthRemoteDataSource {
   Future<AuthEntity> signInWithEmailAndPassword(String email, String password);
   Future<void> resetPassword(String email);
+  Future<AuthEntity?> getCurrentUser();
+  Future<void> signOut();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -34,7 +36,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return AuthEntity(uid: user.uid, email: user.email ?? '');
     } on FirebaseAuthException catch (e) {
       // Melempar kembali FirebaseAuthException untuk di-handle di lapisan atas
-      throw e;
+      rethrow;
     } catch (e) {
       // Melempar exception umum
       throw Exception('Failed to sign in: $e');
@@ -47,10 +49,25 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       await firebaseAuth.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
       // Melempar kembali FirebaseAuthException untuk di-handle di lapisan atas
-      throw e;
+      rethrow;
     } catch (e) {
       // Melempar exception umum
       throw Exception('Failed to reset password: $e');
     }
+  }
+
+  @override
+  Future<AuthEntity?> getCurrentUser() async {
+    final user = firebaseAuth.currentUser;
+    if (user != null) {
+      return AuthEntity(uid: user.uid, email: user.email ?? '');
+    } else {
+      return null;
+    }
+  }
+
+  @override
+  Future<void> signOut() async {
+    await firebaseAuth.signOut();
   }
 }
