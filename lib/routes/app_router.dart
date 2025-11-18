@@ -24,7 +24,11 @@ class AppRouter {
     // =========================================================================
     redirect: (BuildContext context, GoRouterState state) {
       // Akses AuthState dari Provider tanpa mendengarkan perubahannya
-      final authState = Provider.of<AuthNotifier>(context, listen: false).state;
+      final authNotifier = Provider.of<AuthNotifier>(context, listen: false);
+      final AuthState authState = authNotifier.state;
+
+      // Ambil nilai dari AuthState
+      final bool isCheckingAuth = authState.isCheckingAuth;
       final bool isLoggedIn = authState.user != null;
 
       // Path yang sedang dituju pengguna
@@ -34,6 +38,12 @@ class AppRouter {
       final bool isAuthPage =
           goingTo == AppRoutes.login || goingTo == AppRoutes.forgotPassword;
 
+      if (isCheckingAuth) {
+        // Jika masih loading, tetap di halaman yang dituju saat ini (atau tampilkan Splash/Loading screen)
+        // Jika Anda memiliki halaman Loading/Splash screen, arahkan ke sana
+        // Contoh: return AppRoutes.loading;
+        return null; // Membiarkan GoRouter menunggu sambil menampilkan halaman saat ini (atau halaman yang diminta)
+      }
       // 1. SKENARIO: Sudah Login, tapi mencoba mengakses halaman Login/Auth.
       if (isLoggedIn && isAuthPage) {
         // Redirect ke halaman utama (Onboarding atau Dashboard)

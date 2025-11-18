@@ -14,4 +14,10 @@ abstract class AuthRepository {
   Future<Either<AuthFailure, Unit>> resetPassword(String email);
 
   Future<Either<AuthFailure, Unit>> signOut();
+
+  Future<Either<AuthFailure, Unit>> cacheAuthData(AuthEntity authData);
+
+  Future<Either<AuthFailure, AuthEntity?>> getCachedAuthData();
+
+  Future<Either<AuthFailure, Unit>> clearCachedAuthData();
 }

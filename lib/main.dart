@@ -11,6 +11,7 @@ import 'features/auth/data/datasources/auth_remote_datasource.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/domain/usecases/sign_in_usecase.dart';
 import 'features/auth/domain/usecases/sign_out_usecase.dart';
+import 'features/auth/domain/usecases/get_cached_auth_data_usecase.dart';
 import 'features/auth/domain/usecases/reset_password_usecase.dart';
 import 'features/auth/presentation/providers/auth_notifier.dart';
 // --- Komponen Lain ---
@@ -31,8 +32,16 @@ void main() async {
   final signInUsecase = SignInUsecase(authRepository);
   final resetPasswordUsecase = ResetPasswordUsecase(authRepository);
   final signOutUsecase = SignOutUsecase(authRepository);
+  final getCachedAuthDataUsecase = GetCachedAuthDataUsecase(authRepository);
   // --- End DI Auth ---
 
+  final authNotifier = AuthNotifier(
+    signInUsecase,
+    resetPasswordUsecase,
+    signOutUsecase,
+    getCachedAuthDataUsecase,
+  );
+  await authNotifier.initializeAuth();
   runApp(
     // Menggunakan MultiProvider untuk menyediakan semua ChangeNotifier
     MultiProvider(
@@ -42,10 +51,7 @@ void main() async {
           create: (_) => AppState(OnboardingRepositoryImpl()),
         ),
         // 2. Provider untuk AuthNotifier (Firebase Auth)
-        ChangeNotifierProvider(
-          create: (_) =>
-              AuthNotifier(signInUsecase, resetPasswordUsecase, signOutUsecase),
-        ),
+        ChangeNotifierProvider(create: (_) => authNotifier),
       ],
       child: const MyApp(),
     ),

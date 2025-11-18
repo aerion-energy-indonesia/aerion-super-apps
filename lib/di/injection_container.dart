@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../features/auth/domain/repositories/auth_repository.dart';
 import '../features/auth/domain/usecases/sign_in_usecase.dart';
 import '../features/auth/domain/usecases/reset_password_usecase.dart';
+import '../features/auth/domain/usecases/get_cached_auth_data_usecase.dart';
 // Data
 import '../features/auth/data/datasources/auth_remote_datasource.dart';
 import '../features/auth/data/repositories/auth_repository_impl.dart';
@@ -35,6 +36,7 @@ Future<void> initDependencies() async {
       serviceLocator(), // Membutuhkan SignInUsecase
       serviceLocator(), // Membutuhkan ResetPasswordUsecase
       serviceLocator(), // Membutuhkan SignOutUsecase
+      serviceLocator(), // Membutuhkan GetCachedAuthDataUsecase
     ),
   );
 

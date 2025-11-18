@@ -144,7 +144,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset(
-                            'assets/images/icons/hres.png',
+                            'assets/images/icons/aerion-logo.png',
                             width: 80,
                             height: 80,
                             fit: BoxFit.contain,

@@ -133,7 +133,11 @@ class _ClusterPageState extends State<ClusterPage> {
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
         onPressed: () {
-          context.pop();
+          if (Navigator.of(context).canPop()) {
+            context.pop();
+          } else {
+            context.go('/onboarding');
+          }
         },
       ),
       title: const Text(
