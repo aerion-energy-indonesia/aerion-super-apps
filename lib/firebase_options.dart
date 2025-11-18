@@ -47,29 +47,29 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyA9ADGXrTIT1lSZOwshuiKiKhgEP5bZjAY',
-    appId: '1:365053340453:web:eea83afd03d5da097248cc',
-    messagingSenderId: '365053340453',
-    projectId: 'aerion-dashboard-26510',
-    authDomain: 'aerion-dashboard-26510.firebaseapp.com',
-    storageBucket: 'aerion-dashboard-26510.firebasestorage.app',
-    measurementId: 'G-C3LPCFT8PV',
+    apiKey: 'AIzaSyBb-sSWpJPSQUChw_qndxQhJOP3Nx5nTbE',
+    appId: '1:996118329348:web:518dbf905db31755e79d51',
+    messagingSenderId: '996118329348',
+    projectId: 'aerion-super-apps',
+    authDomain: 'aerion-super-apps.firebaseapp.com',
+    storageBucket: 'aerion-super-apps.firebasestorage.app',
+    measurementId: 'G-15J055276K',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyATso9g69bC9y1sjBbXgDMKuR31ZFOCwcw',
-    appId: '1:365053340453:android:cd87c67d203d30427248cc',
-    messagingSenderId: '365053340453',
-    projectId: 'aerion-dashboard-26510',
-    storageBucket: 'aerion-dashboard-26510.firebasestorage.app',
+    apiKey: 'AIzaSyBJKHqh1wlB-1PznYWCNuDWRl8BarsfBhM',
+    appId: '1:996118329348:android:aa898d80d3bcf88ce79d51',
+    messagingSenderId: '996118329348',
+    projectId: 'aerion-super-apps',
+    storageBucket: 'aerion-super-apps.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDGvlfgMlLAYcRKxVAu6I0nZLmqihOXVmY',
-    appId: '1:365053340453:ios:37bd4d8863a5676d7248cc',
-    messagingSenderId: '365053340453',
-    projectId: 'aerion-dashboard-26510',
-    storageBucket: 'aerion-dashboard-26510.firebasestorage.app',
+    apiKey: 'AIzaSyDlasDUPKaLa-FPgkbYAMDpP-NYPXJSB78',
+    appId: '1:996118329348:ios:f770bcda73140927e79d51',
+    messagingSenderId: '996118329348',
+    projectId: 'aerion-super-apps',
+    storageBucket: 'aerion-super-apps.firebasestorage.app',
     iosBundleId: 'com.aerion',
   );
 }

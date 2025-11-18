@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "365053340453",
-    "project_id": "aerion-dashboard-26510",
-    "storage_bucket": "aerion-dashboard-26510.firebasestorage.app"
+    "project_number": "996118329348",
+    "project_id": "aerion-super-apps",
+    "storage_bucket": "aerion-super-apps.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:365053340453:android:cd87c67d203d30427248cc",
+        "mobilesdk_app_id": "1:996118329348:android:aa898d80d3bcf88ce79d51",
         "android_client_info": {
           "package_name": "com.aerion"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyATso9g69bC9y1sjBbXgDMKuR31ZFOCwcw"
+          "current_key": "AIzaSyBJKHqh1wlB-1PznYWCNuDWRl8BarsfBhM"
         }
       ],
       "services": {

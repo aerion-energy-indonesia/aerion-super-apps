@@ -110,8 +110,12 @@ flutter:
         - asset: fonts/Inter-Italic-VariableFont_opsz,wght.ttf
         - asset: fonts/Inter-VariableFont_opsz,wght.ttf
           weight: 700
+    - family: ZenDots
+      fonts:
+        - asset: fonts/ZenDots-Regular.ttf
   assets:
         - assets/images/icons/aerion-icon.png
+        - assets/images/icons/aerion-logo.png
         - assets/images/icons/aerion.png
         - assets/images/icons/hres.png
         - assets/images/icons/isuzu.png 

@@ -93,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     // Image.asset
                     Image.asset(
-                      'assets/images/icons/hres.png',
+                      'assets/images/icons/aerion-logo.png',
                       height: 80,
                       width: 80,
                       // Jika asset tidak ada, gunakan placeholder
@@ -102,23 +102,23 @@ class _LoginPageState extends State<LoginPage> {
                           height: 80,
                           width: 80,
                           color: Colors.grey[300],
-                          child: const Center(child: Text('HRES\nLogo')),
+                          child: const Center(child: Text('Aerion\nLogo')),
                         );
                       },
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      'HRES',
+                      'AERION',
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF364153),
-                        fontFamily: 'Michroma',
+                        fontFamily: 'ZenDots',
                       ),
                     ),
                     const SizedBox(height: 4),
                     const Text(
-                      'Super App',
+                      'SUPER APPS',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
