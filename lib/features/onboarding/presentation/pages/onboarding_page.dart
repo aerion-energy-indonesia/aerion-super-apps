@@ -159,16 +159,16 @@ class _OnboardingPageState extends State<OnboardingPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: const [
                                 Text(
-                                  'HRES',
+                                  'AERION',
                                   style: TextStyle(
                                     fontSize: 32,
                                     fontWeight: FontWeight.w700,
                                     color: Color(0xFF364153),
-                                    fontFamily: 'Michroma',
+                                    fontFamily: 'ZenDots',
                                   ),
                                 ),
                                 Text(
-                                  'Super App',
+                                  'SUPER APPS',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w400,
@@ -179,10 +179,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
                               ],
                             ),
                           ),
-                          const SizedBox(width: 24),
                         ],
                       ),
                     ),
+
+                    const SizedBox(height: 24),
 
                     const Divider(
                       height: 1,
