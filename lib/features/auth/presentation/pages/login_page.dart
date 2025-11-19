@@ -44,7 +44,14 @@ class _LoginPageState extends State<LoginPage> {
       // Cek sukses untuk navigasi
       if (authState.user != null && authState.error == null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.go('/onboarding');
+          final role = authState.user!.role;
+          if (role == 'spv') {
+            context.go('/onboarding');
+            return;
+          } else if (role == 'pic') {
+            context.go('/cluster');
+            return;
+          }
         });
       }
     };

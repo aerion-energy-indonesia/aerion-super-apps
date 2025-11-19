@@ -6,6 +6,8 @@ import 'features/onboarding/data/repositories/onboarding_repository_impl.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
+// Tambahan untuk Firestore ---
+import 'package:cloud_firestore/cloud_firestore.dart';
 // --- Import Komponen Auth Clean Architecture ---
 import 'features/auth/data/datasources/auth_remote_datasource.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
@@ -26,8 +28,11 @@ void main() async {
   // --- Dependency Injection (DI) untuk AuthNotifier ---
   // Kita inisialisasi semua layer Auth di sini:
   final firebaseAuthInstance = FirebaseAuth.instance;
-
-  final authRemoteDataSource = AuthRemoteDataSourceImpl(firebaseAuthInstance);
+  final firestoreInstance = FirebaseFirestore.instance;
+  final authRemoteDataSource = AuthRemoteDataSourceImpl(
+    firebaseAuthInstance,
+    firestoreInstance,
+  );
   final authRepository = AuthRepositoryImpl(authRemoteDataSource);
   final signInUsecase = SignInUsecase(authRepository);
   final resetPasswordUsecase = ResetPasswordUsecase(authRepository);
