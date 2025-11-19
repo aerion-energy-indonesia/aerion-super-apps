@@ -1,3 +1,4 @@
+import 'package:aerion_dashboard/features/cluster/domain/usecases/cluster_usecase.dart';
 import 'package:get_it/get_it.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -5,9 +6,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../features/auth/domain/repositories/auth_repository.dart';
 import '../features/auth/domain/usecases/sign_in_usecase.dart';
 import '../features/auth/domain/usecases/reset_password_usecase.dart';
+import '../features/cluster/domain/repositories/cluster_repository.dart';
 // Data
 import '../features/auth/data/datasources/auth_remote_datasource.dart';
 import '../features/auth/data/repositories/auth_repository_impl.dart';
+import '../features/cluster/data/repositories/cluster_repository_impl.dart';
 // Presentation
 import '../features/auth/presentation/providers/auth_notifier.dart';
 
@@ -44,6 +47,11 @@ Future<void> initDependencies() async {
     () => SignInUsecase(serviceLocator()), // Membutuhkan AuthRepository
   );
 
+  // Tambahkan registrasi untuk ClusterUsecase
+  serviceLocator.registerLazySingleton(
+    () => ClusterUsecase(serviceLocator()), // Membutuhkan ClusterRepository
+  );
+
   // Tambahkan registrasi untuk ResetPasswordUsecase
   serviceLocator.registerLazySingleton(
     () => ResetPasswordUsecase(serviceLocator()), // Membutuhkan AuthRepository
@@ -55,6 +63,12 @@ Future<void> initDependencies() async {
     () => AuthRepositoryImpl(
       serviceLocator(),
     ), // Membutuhkan AuthRemoteDataSource
+  );
+
+  serviceLocator.registerLazySingleton<ClusterRepository>(
+    () => ClusterRepositoryImpl(
+      serviceLocator(),
+    ), // Membutuhkan ClusterRemoteDataSource
   );
 
   // Data Layer - Data Sources

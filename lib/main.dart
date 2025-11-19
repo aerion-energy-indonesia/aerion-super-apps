@@ -1,3 +1,5 @@
+import 'package:aerion_dashboard/features/cluster/data/datasources/cluster_remote_datasource.dart';
+import 'package:aerion_dashboard/features/cluster/presentation/providers/cluster_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'app_state.dart';
@@ -16,6 +18,8 @@ import 'features/auth/domain/usecases/sign_out_usecase.dart';
 import 'features/auth/domain/usecases/get_cached_auth_data_usecase.dart';
 import 'features/auth/domain/usecases/reset_password_usecase.dart';
 import 'features/auth/presentation/providers/auth_notifier.dart';
+import 'features/cluster/domain/usecases/cluster_usecase.dart';
+import 'features/cluster/data/repositories/cluster_repository_impl.dart';
 // --- Komponen Lain ---
 import 'l10n/app_localizations.dart';
 import 'routes/app_router.dart';
@@ -38,6 +42,13 @@ void main() async {
   final resetPasswordUsecase = ResetPasswordUsecase(authRepository);
   final signOutUsecase = SignOutUsecase(authRepository);
   final getCachedAuthDataUsecase = GetCachedAuthDataUsecase(authRepository);
+
+  final ClusterRemoteDatasource clusterRemoteDatasource =
+      ClusterRemoteDatasourceImpl(firestoreInstance);
+  final clusterRepository = ClusterRepositoryImpl(clusterRemoteDatasource);
+  final getClusterUsecase = ClusterUsecase(
+    clusterRepository,
+  ); // Tambahkan ini jika diperlukan
   // --- End DI Auth ---
 
   final authNotifier = AuthNotifier(
@@ -57,6 +68,10 @@ void main() async {
         ),
         // 2. Provider untuk AuthNotifier (Firebase Auth)
         ChangeNotifierProvider(create: (_) => authNotifier),
+        // 3. Provider untuk ClusterNotifier (jika ada)
+        ChangeNotifierProvider(
+          create: (_) => ClusterNotifier(getClusterUsecase),
+        ),
       ],
       child: const MyApp(),
     ),
