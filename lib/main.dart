@@ -1,5 +1,6 @@
 import 'package:aerion_dashboard/features/cluster/data/datasources/cluster_remote_datasource.dart';
 import 'package:aerion_dashboard/features/cluster/presentation/providers/cluster_notifier.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'app_state.dart';
@@ -27,6 +28,8 @@ import 'themes/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  setUrlStrategy(PathUrlStrategy());
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // --- Dependency Injection (DI) untuk AuthNotifier ---
