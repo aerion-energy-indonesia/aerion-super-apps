@@ -9,6 +9,7 @@ import 'package:aerion_dashboard/features/auth/presentation/pages/forgot_passwor
 import 'package:aerion_dashboard/features/cluster/presentation/pages/cluster_page.dart';
 import 'package:aerion_dashboard/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:aerion_dashboard/features/profile/presentation/pages/profile_page.dart';
+import 'package:aerion_dashboard/features/sites/presentation/pages/sites_page.dart';
 import '../features/auth/presentation/providers/auth_notifier.dart';
 import 'app_routes.dart';
 
@@ -84,6 +85,11 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.cluster,
         builder: (context, state) => const ClusterPage(),
+      ),
+
+      GoRoute(
+        path: AppRoutes.sites,
+        builder: (context, state) => const SitesPage(),
       ),
 
       // Rute Utama: Dashboard Page
