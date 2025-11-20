@@ -135,6 +135,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     title: 'Ganti Kata Sandi',
                     onTap: () {
                       // Arahkan ke halaman ganti password (opsional)
+                      context.go('/change-password');
                     },
                   ),
                   _buildProfileTile(
@@ -142,6 +143,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     title: 'Bahasa',
                     onTap: () {
                       // Arahkan ke halaman pengaturan bahasa
+                      context.go('/language');
                     },
                   ),
 

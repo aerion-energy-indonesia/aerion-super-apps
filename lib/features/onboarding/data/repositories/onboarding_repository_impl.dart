@@ -12,19 +12,19 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
         'id': '0',
         'title': 'Komatsu Undercarriage Indonesia',
         'subtitle': 'Komatsu Undercarriage Indonesia',
-        'logoAsset': 'assets/images/icons/kui.png',
+        'logoAsset': 'assets/images/logo/kui.png',
       },
       {
         'id': '1',
         'title': 'Komatsu International',
         'subtitle': 'Komatsu International',
-        'logoAsset': 'assets/images/icons/komatsu.png',
+        'logoAsset': 'assets/images/logo/komatsu.png',
       },
       {
         'id': '2',
         'title': 'Komatsu United Tractor',
         'subtitle': 'Komatsu United Tractor',
-        'logoAsset': 'assets/images/icons/komatsu.png',
+        'logoAsset': 'assets/images/logo/komatsu.png',
       },
     ];
     return data.map((e) => OnboardingItemModel.fromJson(e)).toList();

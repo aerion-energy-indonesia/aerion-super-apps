@@ -121,16 +121,19 @@ flutter:
       fonts:
         - asset: fonts/ZenDots-Regular.ttf
   assets:
-        - assets/images/icons/aerion-icon.png
-        - assets/images/icons/aerion-logo.png
-        - assets/images/icons/aerion.png
-        - assets/images/icons/hres.png
-        - assets/images/icons/isuzu.png 
-        - assets/images/icons/pertamina.png
-        - assets/images/icons/telkom.png
-        - assets/images/icons/komatsu.png
-        - assets/images/icons/kui.png
-        - assets/images/placeholder/placeholder.png    
+        - assets/images/logo/aerion-icon.png
+        - assets/images/logo/aerion-logo.png
+        - assets/images/logo/aerion.png
+        - assets/images/logo/hres.png
+        - assets/images/logo/isuzu.png 
+        - assets/images/logo/pertamina.png
+        - assets/images/logo/telkom.png
+        - assets/images/logo/komatsu.png
+        - assets/images/logo/kui.png
+        - assets/images/placeholder/placeholder.png
+        - assets/images/icons/alert_triangle.png    
+        - assets/images/icons/monitor.png
+        - assets/images/icons/user.png
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf

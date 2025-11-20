@@ -121,7 +121,6 @@ class _ClusterPageState extends State<ClusterPage> {
       backgroundColor: Colors.grey[100], // Background terang
       appBar: _buildAppBar(),
       body: _buildBody(),
-      bottomNavigationBar: _buildBottomNavBar(), // Menambahkan BNav placeholder
     );
   }
 

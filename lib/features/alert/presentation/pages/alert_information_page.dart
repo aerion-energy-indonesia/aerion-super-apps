@@ -8,13 +8,13 @@ import 'package:aerion_dashboard/features/onboarding/domain/entities/onboarding_
 // MODEL & ENUM
 // =========================================================================
 
-class Sites {
+class AlertEntity {
   final String id; // Digunakan sebagai SN
   final String name; // Nama Cabang/Pusat
   final String address; // Alamat detail
-  final SitesStatus status;
+  final AlertStatus status;
 
-  Sites({
+  AlertEntity({
     required this.id,
     required this.name,
     required this.address,
@@ -23,36 +23,36 @@ class Sites {
 }
 
 // Mengganti nama enum agar lebih sesuai dengan visual (Normal/Offline)
-enum SitesStatus { all, normal, offline, maintenance }
+enum AlertStatus { all, normal, offline, maintenance }
 
 // =========================================================================
 // UTILITIES
 // =========================================================================
 
 // Utility untuk mendapatkan warna berdasarkan status
-Color _statusColor(SitesStatus status) {
+Color _statusColor(AlertStatus status) {
   switch (status) {
-    case SitesStatus.normal:
+    case AlertStatus.normal:
       return Colors.green;
-    case SitesStatus.offline:
+    case AlertStatus.offline:
       return Colors.red;
-    case SitesStatus.maintenance:
+    case AlertStatus.maintenance:
       return Colors.orange;
-    case SitesStatus.all:
+    case AlertStatus.all:
       return Colors.blueGrey;
   }
 }
 
 // Utility untuk mendapatkan teks label status
-String _statusLabel(SitesStatus status) {
+String _statusLabel(AlertStatus status) {
   switch (status) {
-    case SitesStatus.normal:
+    case AlertStatus.normal:
       return 'Normal';
-    case SitesStatus.offline:
+    case AlertStatus.offline:
       return 'Offline';
-    case SitesStatus.maintenance:
+    case AlertStatus.maintenance:
       return 'Maintenance';
-    case SitesStatus.all:
+    case AlertStatus.all:
       return 'All';
   }
 }
@@ -61,21 +61,21 @@ String _statusLabel(SitesStatus status) {
 // WIDGET UTAMA (SITES PAGE)
 // =========================================================================
 
-class SitesPage extends StatefulWidget {
+class AlertInformationPage extends StatefulWidget {
   final OnboardingItem? cluster;
 
   // Mengubah ke const, asalkan cluster dijamin menjadi objek konstan
   // atau diterima langsung dari GoRouter state.
-  const SitesPage({super.key, required this.cluster});
+  const AlertInformationPage({super.key, required this.cluster});
 
   @override
-  State<SitesPage> createState() => _SitesPageState();
+  State<AlertInformationPage> createState() => _AlertInformationPage();
 }
 
-class _SitesPageState extends State<SitesPage> {
+class _AlertInformationPage extends State<AlertInformationPage> {
   final TextEditingController _searchController = TextEditingController();
-  List<Sites> _allSitess = [];
-  List<Sites> _filteredSitess = [];
+  List<AlertEntity> _allSitess = [];
+  List<AlertEntity> _filteredSitess = [];
 
   @override
   void initState() {
@@ -106,33 +106,33 @@ class _SitesPageState extends State<SitesPage> {
   }
 
   // MOCK DATA: Diperbarui agar sesuai dengan data di desain
-  List<Sites> _mockSitess() {
+  List<AlertEntity> _mockSitess() {
     return [
-      Sites(
+      AlertEntity(
         id: '534315325189731024',
         name: 'Plant A', // Diubah sesuai gambar
         address:
             'JL Gatot Subroto No. Kav. 52, Kuningan Barat, Jakarta Selatan',
-        status: SitesStatus.normal,
+        status: AlertStatus.normal,
       ),
-      Sites(
+      AlertEntity(
         id: '534315325189731024',
         name: 'Plant B', // Diubah sesuai gambar
         address:
             'JL Gatot Subroto No. Kav. 52, Kuningan Barat, Jakarta Selatan',
-        status: SitesStatus.normal,
+        status: AlertStatus.normal,
       ),
-      Sites(
+      AlertEntity(
         id: '534315325189731024',
         name: 'Plant C', // Diubah sesuai gambar
         address: 'JL Japati No. 1, Bandung',
-        status: SitesStatus.offline,
+        status: AlertStatus.offline,
       ),
-      Sites(
+      AlertEntity(
         id: '112233445566778899',
         name: 'Cabang Medan',
         address: 'JL Sisingamangaraja No. 5, Medan',
-        status: SitesStatus.maintenance,
+        status: AlertStatus.maintenance,
       ),
     ];
   }
@@ -173,7 +173,7 @@ class _SitesPageState extends State<SitesPage> {
             children: [
               // Judul Halaman
               const Text(
-                'Installation List',
+                'Alert Information',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -283,12 +283,8 @@ class _SitesPageState extends State<SitesPage> {
         ),
       ],
       onTap: (index) {
-        if (index == 1) {
-          context.go('/alert');
-        } else if (index == 2) {
-          context.go('/dashboard/profile');
-        }
-        // index 0 (Monitor) does nothing, stays on current page
+        // Implementasi navigasi bottom bar di sini jika diperlukan
+        // navigate to alert page or account page based on index
       },
     );
   }
@@ -299,7 +295,7 @@ class _SitesPageState extends State<SitesPage> {
 // =========================================================================
 
 class SitesCard extends StatelessWidget {
-  final Sites sites;
+  final AlertEntity sites;
 
   const SitesCard({required this.sites, super.key});
 
@@ -314,7 +310,7 @@ class SitesCard extends StatelessWidget {
       child: InkWell(
         hoverColor: Colors.white,
         onTap: () {
-          // Navigasi ke Dashboard dan kirim data 'Sites' yang dipilih
+          // Navigasi ke Dashboard dan kirim data 'AlertEntity' yang dipilih
           context.go('/dashboard', extra: sites);
         },
         borderRadius: BorderRadius.circular(12),
@@ -390,7 +386,7 @@ class SitesCard extends StatelessWidget {
 // =========================================================================
 
 class _StatusBadge extends StatelessWidget {
-  final SitesStatus status;
+  final AlertStatus status;
 
   const _StatusBadge({required this.status});
 

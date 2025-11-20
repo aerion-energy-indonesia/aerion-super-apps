@@ -100,7 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     // Image.asset
                     Image.asset(
-                      'assets/images/icons/aerion-logo.png',
+                      'assets/images/logo/aerion-logo.png',
                       height: 80,
                       width: 80,
                       // Jika asset tidak ada, gunakan placeholder
