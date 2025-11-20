@@ -5,7 +5,6 @@ class AppRoutes {
   static const String root = '/';
   static const String login = '/login';
   static const String forgotPassword = '/forgot-password';
-  static const String onboarding = '/onboarding';
   static const String sites = '/sites';
   static const String cluster = '/cluster';
   static const String dashboard = '/dashboard';

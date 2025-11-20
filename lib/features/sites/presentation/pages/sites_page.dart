@@ -1,8 +1,11 @@
+import 'package:aerion_dashboard/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:aerion_dashboard/features/onboarding/domain/entities/onboarding_item.dart';
 
 // =========================================================================
-// MODEL & ENUM (Tidak Berubah Signifikan, hanya penamaan status)
+// MODEL & ENUM
 // =========================================================================
 
 class Sites {
@@ -55,33 +58,51 @@ String _statusLabel(SitesStatus status) {
 }
 
 // =========================================================================
-// WIDGET UTAMA
+// WIDGET UTAMA (SITES PAGE)
 // =========================================================================
 
 class SitesPage extends StatefulWidget {
-  const SitesPage({super.key});
+  final OnboardingItem? cluster;
+
+  // Mengubah ke const, asalkan cluster dijamin menjadi objek konstan
+  // atau diterima langsung dari GoRouter state.
+  const SitesPage({super.key, required this.cluster});
 
   @override
   State<SitesPage> createState() => _SitesPageState();
 }
 
 class _SitesPageState extends State<SitesPage> {
-  // Menghapus _searchController dan filter logic karena tidak ada di desain yang diberikan.
+  final TextEditingController _searchController = TextEditingController();
   List<Sites> _allSitess = [];
+  List<Sites> _filteredSitess = [];
 
   @override
   void initState() {
     super.initState();
-    // Mengganti _allSitess dengan data mock baru yang lebih detail
     _allSitess = _mockSitess();
-  }
+    _filteredSitess = _allSitess;
 
-  // Menghapus _applyFilters, _setFilter, _clearSearch, dan _buildFilterMenu
-  // karena tidak relevan dengan desain statis yang diminta.
+    _searchController.addListener(_applySearchFilter);
+  }
 
   @override
   void dispose() {
+    _searchController.removeListener(_applySearchFilter);
+    _searchController.dispose();
     super.dispose();
+  }
+
+  // Logika Filter
+  void _applySearchFilter() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredSitess = _allSitess.where((site) {
+        return site.name.toLowerCase().contains(query) ||
+            site.address.toLowerCase().contains(query) ||
+            site.id.contains(query);
+      }).toList();
+    });
   }
 
   // MOCK DATA: Diperbarui agar sesuai dengan data di desain
@@ -89,28 +110,29 @@ class _SitesPageState extends State<SitesPage> {
     return [
       Sites(
         id: '534315325189731024',
-        name: 'Kantor Pusat Jakarta',
+        name: 'Plant A', // Diubah sesuai gambar
         address:
             'JL Gatot Subroto No. Kav. 52, Kuningan Barat, Jakarta Selatan',
         status: SitesStatus.normal,
       ),
       Sites(
-        id: '1362426426452321',
-        name: 'Kantor Pusat Bandung',
-        address: 'JL Japati No. 1, Bandung',
-        status: SitesStatus.offline,
+        id: '534315325189731024',
+        name: 'Plant B', // Diubah sesuai gambar
+        address:
+            'JL Gatot Subroto No. Kav. 52, Kuningan Barat, Jakarta Selatan',
+        status: SitesStatus.normal,
       ),
       Sites(
-        id: '998877665544332211',
-        name: 'Cabang Surabaya',
-        address: 'JL A Yani No. 100, Surabaya',
-        status: SitesStatus.maintenance,
+        id: '534315325189731024',
+        name: 'Plant C', // Diubah sesuai gambar
+        address: 'JL Japati No. 1, Bandung',
+        status: SitesStatus.offline,
       ),
       Sites(
         id: '112233445566778899',
         name: 'Cabang Medan',
         address: 'JL Sisingamangaraja No. 5, Medan',
-        status: SitesStatus.normal,
+        status: SitesStatus.maintenance,
       ),
     ];
   }
@@ -119,110 +141,156 @@ class _SitesPageState extends State<SitesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100], // Background terang
-      appBar: _buildAppBar(),
+      // Hapus AppBar default, kita buat kustom di Body
       body: _buildBody(),
-      bottomNavigationBar: _buildBottomNavBar(), // Menambahkan BNav placeholder
+      bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
-  // --- Bagian AppBar (Sesuai Desain Gambar) ---
-  AppBar _buildAppBar() {
-    return AppBar(
-      elevation: 0,
-      backgroundColor: Colors.white,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-        onPressed: () {
-          if (Navigator.of(context).canPop()) {
-            context.pop();
-          } else {
-            context.go('/onboarding');
-          }
-        },
-      ),
-      title: const Text(
-        'PT. Telkomsel', // Menggunakan nama perusahaan sebagai judul
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 18,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 16.0),
-          child: Row(
+  // --- Bagian Body (Mengandung Header Kustom dan List) ---
+  Widget _buildBody() {
+    final cluster = widget.cluster;
+
+    // Default values
+    final clusterImage =
+        cluster?.logoAsset ?? 'assets/images/placeholder/placeholder.png';
+    final clusterTitle = cluster?.title ?? 'Cluster Name';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // 1. Header Kustom (Menggantikan AppBar)
+        Container(
+          padding: const EdgeInsets.only(
+            top: 48,
+            left: 16,
+            right: 16,
+            bottom: 16,
+          ),
+          color: Colors.white, // Background putih untuk header
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.flash_on, color: Colors.red),
-              const SizedBox(width: 4),
-              Text(
-                'Telkomsel',
+              // Judul Halaman
+              const Text(
+                'Installation List',
                 style: TextStyle(
-                  color: Colors.red,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
+                  color: Color(0xFF364153), // Warna teks utama
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Divider(height: 1, thickness: 0.5, color: Colors.grey),
+              const SizedBox(height: 16),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Image.asset(clusterImage, height: 28),
+                      ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          clusterTitle,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'GeisRegular',
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              // Logo/Nama Perusahaan (Komatsu KUI Cikarang)
+              const SizedBox(height: 16),
+
+              // Search Bar
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.backgroundLight,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.grey.shade300, width: 1),
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search location installations',
+                    border: InputBorder.none,
+                    suffixIcon: Icon(Icons.search, color: Colors.grey[600]),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 16,
+                    ),
+                  ),
+                  style: const TextStyle(fontSize: 14),
                 ),
               ),
             ],
           ),
         ),
-      ],
-    );
-  }
 
-  // --- Bagian Body (List Cabang) ---
-  Widget _buildBody() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: Text(
-            'Cabang List',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
+        // 2. Daftar Lokasi (Expanded)
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
+            child: ListView.separated(
+              itemCount: _filteredSitess.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final c = _filteredSitess[index];
+                return SitesCard(sites: c);
+              },
             ),
           ),
         ),
-        Expanded(
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: _allSitess.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final c = _allSitess[index];
-              return SitesCard(sites: c);
-            },
-          ),
-        ),
       ],
     );
   }
 
-  // --- Placeholder Bottom Navigation Bar ---
+  // --- Placeholder Bottom Navigation Bar (Sesuai Desain Gambar) ---
   Widget _buildBottomNavBar() {
     return BottomNavigationBar(
       elevation: 4,
-      selectedItemColor: Colors.red,
-      unselectedItemColor: Colors.grey,
+      backgroundColor: Colors.white,
+      type: BottomNavigationBarType.fixed,
+      selectedItemColor: const Color(0xFFE41E26), // Merah
+      unselectedItemColor: Colors.grey[500],
+      currentIndex: 0, // Monitor aktif
       items: const [
         BottomNavigationBarItem(
-          icon: Icon(Icons.desktop_windows),
+          icon: FaIcon(FontAwesomeIcons.desktop),
           label: 'Monitor',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.warning_amber),
-          label: 'Alarm',
+          icon: FaIcon(FontAwesomeIcons.triangleExclamation),
+          label: 'Alert',
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
+        BottomNavigationBarItem(
+          icon: FaIcon(FontAwesomeIcons.user),
+          label: 'Account',
+        ),
       ],
+      onTap: (index) {
+        // Implementasi navigasi bottom bar di sini jika diperlukan
+        // navigate to alert page or account page based on index
+      },
     );
   }
 }
 
 // =========================================================================
-// WIDGET BARU: SitesCard (Menggantikan Card/ListTile default)
+// WIDGET BARU: SitesCard (Diperbaiki agar sesuai desain)
 // =========================================================================
 
 class SitesCard extends StatelessWidget {
@@ -234,54 +302,72 @@ class SitesCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ), // Lebih bulat
       margin: EdgeInsets.zero,
       child: InkWell(
+        hoverColor: Colors.white,
         onTap: () {
-          context.go('/dashboard');
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(
-          //     content: Text(
-          //       'Detail ${Sites.name} (${_statusLabel(Sites.status)})',
-          //     ),
-          //   ),
-          // );
+          // Navigasi ke Dashboard dan kirim data 'Sites' yang dipilih
+          context.go('/dashboard', extra: sites);
         },
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // SN dan Status Badge (Baris 1)
+              // Baris 1: SN, Status Badge, dan Menu Opsi (...)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'SN: ${sites.id}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // SN
+                        Text(
+                          'SN : ${sites.id}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Status Badge
+                        _StatusBadge(status: sites.status),
+                      ],
                     ),
                   ),
-                  _StatusBadge(status: sites.status),
+                  // Menu Opsi
+                  InkWell(
+                    onTap: () {
+                      // Action untuk Menu
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Icon(Icons.more_vert, color: Colors.grey),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
 
-              // Nama Lokasi (Baris 2)
+              // Baris 2: Nama Lokasi (Tebal)
               Text(
                 sites.name,
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 18, // Ukuran lebih besar
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
               ),
               const SizedBox(height: 4),
 
-              // Alamat Detail (Baris 3)
+              // Baris 3: Alamat Detail (Abu-abu, kecil)
               Text(
                 sites.address,
                 style: TextStyle(fontSize: 14, color: Colors.grey[700]),
@@ -312,14 +398,14 @@ class _StatusBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1), // Background transparan
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(15), // Lebih oval
         border: Border.all(color: color, width: 0.8),
       ),
       child: Text(
         label,
         style: TextStyle(
           color: color,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w600,
           fontSize: 11,
         ),
       ),

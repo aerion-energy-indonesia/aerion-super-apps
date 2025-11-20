@@ -57,7 +57,7 @@ class AuthNotifier extends ChangeNotifier {
   AuthState _state = AuthState();
   AuthState get state => _state; // Getter untuk mengakses state
   //  status inisialisasi
-  bool _isCheckingAuth = true;
+  final bool _isCheckingAuth = true;
   bool get isCheckingAuth => _isCheckingAuth;
 
   // Anggap Anda punya method ini untuk memuat status user dari penyimpanan

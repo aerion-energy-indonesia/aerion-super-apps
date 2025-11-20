@@ -1,5 +1,6 @@
 import 'package:aerion_dashboard/features/cluster/data/datasources/cluster_remote_datasource.dart';
 import 'package:aerion_dashboard/features/cluster/presentation/providers/cluster_notifier.dart';
+// ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

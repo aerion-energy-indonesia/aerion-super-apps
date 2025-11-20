@@ -46,10 +46,10 @@ class _LoginPageState extends State<LoginPage> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           final role = authState.user!.role;
           if (role == 'spv') {
-            context.go('/onboarding');
+            context.go('/cluster');
             return;
           } else if (role == 'pic') {
-            context.go('/cluster');
+            context.go('/sites');
             return;
           }
         });

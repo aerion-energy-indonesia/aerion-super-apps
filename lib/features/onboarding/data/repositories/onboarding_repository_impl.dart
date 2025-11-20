@@ -10,27 +10,21 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
     final data = [
       {
         'id': '0',
-        'title': 'Aerion',
-        'subtitle': 'PT Aerion Energy',
-        'logoAsset': 'assets/images/icons/aerion.png',
+        'title': 'Komatsu Undercarriage Indonesia',
+        'subtitle': 'Komatsu Undercarriage Indonesia',
+        'logoAsset': 'assets/images/icons/kui.png',
       },
       {
         'id': '1',
-        'title': 'Isuzu',
-        'subtitle': 'PT Isuzu Astra Motor',
-        'logoAsset': 'assets/images/icons/isuzu.png',
+        'title': 'Komatsu International',
+        'subtitle': 'Komatsu International',
+        'logoAsset': 'assets/images/icons/komatsu.png',
       },
       {
         'id': '2',
-        'title': 'Pertamina',
-        'subtitle': 'PT Pertamina',
-        'logoAsset': 'assets/images/icons/pertamina.png',
-      },
-      {
-        'id': '3',
-        'title': 'Telkom',
-        'subtitle': 'PT Telkom Indonesia',
-        'logoAsset': 'assets/images/icons/telkom.png',
+        'title': 'Komatsu United Tractor',
+        'subtitle': 'Komatsu United Tractor',
+        'logoAsset': 'assets/images/icons/komatsu.png',
       },
     ];
     return data.map((e) => OnboardingItemModel.fromJson(e)).toList();

@@ -24,15 +24,17 @@ class _OnboardingPageState extends State<OnboardingPage> {
   Widget _buildItemCard(OnboardingItem item) {
     return Card(
       color: Colors.white,
+      surfaceTintColor: Colors.white,
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: const BorderSide(color: Colors.grey, width: 0.1),
       ),
       child: InkWell(
+        hoverColor: Colors.white,
         onTap: () {
           // Logika navigasi atau aksi saat item diklik
-          context.go('/cluster');
+          context.go('/sites', extra: {'cluster': item});
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
@@ -42,20 +44,20 @@ class _OnboardingPageState extends State<OnboardingPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                height: 40,
+                height: 80,
                 alignment: Alignment.center,
                 // Menggunakan Icon dari CardItem
                 child: Image.asset(item.logoAsset, fit: BoxFit.contain),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               Text(
                 item.subtitle,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Color(0xFF364153),
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w800,
                   fontSize: 14,
-                  fontFamily: 'Inter',
+                  fontFamily: 'GeisRegular',
                 ),
               ),
             ],
@@ -126,6 +128,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
     return Scaffold(
       backgroundColor: bgColor,
+      resizeToAvoidBottomInset: false,
       body: state.loading
           ? const Center(child: CircularProgressIndicator())
           : Center(

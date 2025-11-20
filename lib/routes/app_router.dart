@@ -11,6 +11,10 @@ import 'package:aerion_dashboard/features/dashboard/presentation/pages/dashboard
 import 'package:aerion_dashboard/features/profile/presentation/pages/profile_page.dart';
 import 'package:aerion_dashboard/features/sites/presentation/pages/sites_page.dart';
 import '../features/auth/presentation/providers/auth_notifier.dart';
+
+// Params
+import 'package:aerion_dashboard/features/onboarding/domain/entities/onboarding_item.dart';
+
 import 'app_routes.dart';
 
 class AppRouter {
@@ -49,7 +53,7 @@ class AppRouter {
       if (isLoggedIn && isAuthPage) {
         // Redirect ke halaman utama (Onboarding atau Dashboard)
         // Kita gunakan Onboarding sebagai tujuan default setelah login
-        return AppRoutes.onboarding;
+        return AppRoutes.cluster;
       }
 
       // 2. SKENARIO: Belum Login, tapi mencoba mengakses halaman yang dilindungi.
@@ -78,8 +82,8 @@ class AppRouter {
 
       // Rute Utama: Onboarding Page (Target setelah login)
       GoRoute(
-        path: AppRoutes.onboarding,
-        builder: (context, state) => const OnboardingPage(),
+        path: AppRoutes.cluster,
+        builder: (context, state) => const OnboardingPage(), // aka ClusterPage
       ),
 
       GoRoute(
@@ -89,7 +93,14 @@ class AppRouter {
 
       GoRoute(
         path: AppRoutes.sites,
-        builder: (context, state) => const SitesPage(),
+        builder: (context, state) {
+          final cluster =
+              state.extra != null && state.extra is Map<String, dynamic>
+              ? (state.extra as Map<String, dynamic>)['cluster']
+                    as OnboardingItem?
+              : null;
+          return SitesPage(cluster: cluster);
+        },
       ),
 
       // Rute Utama: Dashboard Page

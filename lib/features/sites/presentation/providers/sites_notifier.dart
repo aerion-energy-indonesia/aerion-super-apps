@@ -44,10 +44,7 @@ class SitesNotifier extends ChangeNotifier {
         _state = _state.copyWith(isLoading: false, error: failure.toString());
       },
       (data) {
-        _state = _state.copyWith(
-          isLoading: false,
-          sitesData: data as SitesEntitiy,
-        );
+        _state = _state.copyWith(isLoading: false, sitesData: data);
       },
     );
 

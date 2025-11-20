@@ -48,6 +48,7 @@ dependencies:
   cloud_firestore: ^6.1.0
   shared_preferences: ^2.5.3
   flutter_launcher_icons: ^0.14.4
+  font_awesome_flutter: ^10.12.0
 
 dev_dependencies:
   flutter_test:
@@ -127,7 +128,9 @@ flutter:
         - assets/images/icons/isuzu.png 
         - assets/images/icons/pertamina.png
         - assets/images/icons/telkom.png
-    
+        - assets/images/icons/komatsu.png
+        - assets/images/icons/kui.png
+        - assets/images/placeholder/placeholder.png    
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
