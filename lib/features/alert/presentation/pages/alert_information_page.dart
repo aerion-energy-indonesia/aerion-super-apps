@@ -1,7 +1,6 @@
 import 'package:aerion_dashboard/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:aerion_dashboard/features/onboarding/domain/entities/onboarding_item.dart';
 
 // =========================================================================
@@ -143,7 +142,6 @@ class _AlertInformationPage extends State<AlertInformationPage> {
       backgroundColor: Colors.grey[100], // Background terang
       // Hapus AppBar default, kita buat kustom di Body
       body: _buildBody(),
-      bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
@@ -256,36 +254,6 @@ class _AlertInformationPage extends State<AlertInformationPage> {
           ),
         ),
       ],
-    );
-  }
-
-  // --- Placeholder Bottom Navigation Bar (Sesuai Desain Gambar) ---
-  Widget _buildBottomNavBar() {
-    return BottomNavigationBar(
-      elevation: 4,
-      backgroundColor: Colors.white,
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: const Color(0xFFE41E26), // Merah
-      unselectedItemColor: Colors.grey[500],
-      currentIndex: 0, // Monitor aktif
-      items: const [
-        BottomNavigationBarItem(
-          icon: FaIcon(FontAwesomeIcons.desktop),
-          label: 'Monitor',
-        ),
-        BottomNavigationBarItem(
-          icon: FaIcon(FontAwesomeIcons.triangleExclamation),
-          label: 'Alert',
-        ),
-        BottomNavigationBarItem(
-          icon: FaIcon(FontAwesomeIcons.user),
-          label: 'Account',
-        ),
-      ],
-      onTap: (index) {
-        // Implementasi navigasi bottom bar di sini jika diperlukan
-        // navigate to alert page or account page based on index
-      },
     );
   }
 }

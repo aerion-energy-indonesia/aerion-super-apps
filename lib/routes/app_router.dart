@@ -1,19 +1,23 @@
+import 'package:aerion_dashboard/features/profile/presentation/pages/language_setting_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter_svg/flutter_svg.dart';
 // Import Pages dan Notifier Anda
 import 'package:aerion_dashboard/features/auth/presentation/pages/login_page.dart';
 import 'package:aerion_dashboard/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:aerion_dashboard/features/auth/presentation/pages/forgot_password_page.dart';
+// Note: Perlu mengimpor ClusterPage. Saya asumsikan path-nya sama dengan Dashboard/Sites
 // import 'package:aerion_dashboard/features/cluster/presentation/pages/cluster_page.dart';
 import 'package:aerion_dashboard/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:aerion_dashboard/features/profile/presentation/pages/profile_page.dart';
 import 'package:aerion_dashboard/features/auth/presentation/pages/change_password_page.dart';
-import 'package:aerion_dashboard/features/sites/presentation/pages/sites_page.dart';
+// import 'package:aerion_dashboard/features/sites/presentation/pages/sites_page.dart';
 import 'package:aerion_dashboard/features/alert/presentation/pages/alert_information_page.dart';
-import 'package:aerion_dashboard/features/profile/presentation/pages/language_setting_page.dart';
-import '../features/auth/presentation/providers/auth_notifier.dart'; // Asumsi lokasi AuthNotifier
+import 'package:aerion_dashboard/features/analysis/presentation/pages/analysis_page.dart';
+import 'package:aerion_dashboard/features/data/presentation/pages/data_page.dart';
+import 'package:aerion_dashboard/features/activity/presentation/pages/activity_page.dart';
+import '../features/auth/presentation/providers/auth_notifier.dart';
 
 // Params
 import 'package:aerion_dashboard/features/onboarding/domain/entities/onboarding_item.dart';
@@ -21,51 +25,133 @@ import 'package:aerion_dashboard/features/onboarding/domain/entities/onboarding_
 import 'app_routes.dart';
 
 // =============================================================================
-// SHELL WRAPPER (Biasanya diletakkan di file terpisah, di sini untuk demo ShellRoute)
-// Widget ini akan menahan BottomNavigationBar
+// HELPER WIDGET: SVG ICON BUILDER
+// =============================================================================
+class SvgBottomBarIcon extends StatelessWidget {
+  final String assetPath;
+  final Color color;
+  final double size;
+
+  const SvgBottomBarIcon({
+    super.key,
+    required this.assetPath,
+    required this.color,
+    this.size = 24.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // SvgPicture.asset akan memuat file SVG lokal Anda
+    return SvgPicture.asset(
+      assetPath,
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+      width: size,
+      height: size,
+      // Placeholder jika file SVG tidak ditemukan
+      placeholderBuilder: (BuildContext context) =>
+          Icon(Icons.error, color: color),
+    );
+  }
+}
+
+// =============================================================================
+// SHELL WRAPPER (Diperbarui untuk menggunakan SVG dan rute yang benar)
 // =============================================================================
 class ShellWrapper extends StatelessWidget {
   final Widget child;
   const ShellWrapper({super.key, required this.child});
 
-  // Helper untuk mendapatkan index rute dari list path
+  // Warna dan Konstanta
+  static const Color activeIconColor = Color(0xFFE41E26); // Merah aktif
+  static const Color inactiveIconColor = Color(
+    0xFF364153,
+  ); // Abu-abu gelap non-aktif
+
+  // Daftar Item Navigasi Bawah (Dengan path SVG yang diasumsikan)
+  final List<({String location, String asset, String label})> tabs = const [
+    (
+      location: AppRoutes.dashboard,
+      asset: 'assets/svg/grid.svg',
+      label: 'Monitor',
+    ),
+    (
+      location: AppRoutes.activity,
+      asset: 'assets/svg/activity.svg',
+      label: 'Graphic',
+    ),
+    (
+      location: AppRoutes.analysis,
+      asset: 'assets/svg/pie-chart.svg',
+      label: 'Analysis',
+    ),
+    (location: AppRoutes.data, asset: 'assets/svg/file.svg', label: 'Data'),
+    (
+      location: AppRoutes.alert,
+      asset: 'assets/svg/alert-triangle.svg',
+      label: 'Alert',
+    ), // Mengubah label
+  ];
+
+  // Mendapatkan indeks tab yang aktif berdasarkan lokasi saat ini
   int _getPageIndex(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
     final routes = [
-      AppRoutes.cluster,
-      AppRoutes.sites,
       AppRoutes.dashboard,
+      AppRoutes.activity,
+      AppRoutes.analysis,
+      AppRoutes.data,
       AppRoutes.alert,
     ];
-    return routes.indexOf(location);
+
+    // Temukan index rute utama yang cocok dengan awal lokasi saat ini
+    final index = routes.indexWhere(
+      (routePath) => location.startsWith(routePath),
+    );
+
+    return index == -1 ? 0 : index; // Default ke Cluster
   }
 
   @override
   Widget build(BuildContext context) {
-    // Daftar item navigasi
-    final items = const [
-      BottomNavigationBarItem(icon: Icon(Icons.hub), label: 'Cluster'),
-      BottomNavigationBarItem(icon: Icon(Icons.location_on), label: 'Sites'),
-      BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
-      BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Alert'),
-    ];
+    final int selectedIndex = _getPageIndex(context);
 
     return Scaffold(
-      body:
-          child, // Menampilkan halaman yang aktif (ClusterPage, SitesPage, dll)
+      body: child, // Menampilkan halaman anak (ClusterPage, SitesPage, dll)
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _getPageIndex(context) == -1 ? 0 : _getPageIndex(context),
-        items: items,
+        currentIndex: selectedIndex,
+        items: tabs.asMap().entries.map((entry) {
+          final index = entry.key;
+          final tab = entry.value;
+          final isSelected = index == selectedIndex;
+
+          return BottomNavigationBarItem(
+            icon: SvgBottomBarIcon(
+              assetPath: tab.asset,
+              color: isSelected
+                  ? activeIconColor
+                  : inactiveIconColor.withOpacity(0.6),
+            ),
+            label: tab.label,
+          );
+        }).toList(),
+
         type: BottomNavigationBarType.fixed,
+        selectedItemColor: activeIconColor,
+        unselectedItemColor: inactiveIconColor.withOpacity(0.6),
+        selectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.normal,
+          fontSize: 11,
+        ),
+        backgroundColor: Colors.white,
+        elevation: 8,
+
         onTap: (index) {
-          final routes = [
-            AppRoutes.cluster,
-            AppRoutes.sites,
-            AppRoutes.dashboard,
-            AppRoutes.alert,
-          ];
-          // Navigasi ke rute tanpa merusak state tab lain
-          context.go(routes[index]);
+          // Navigasi ke rute utama ShellRoute
+          context.go(tabs[index].location);
         },
       ),
     );
@@ -76,9 +162,7 @@ class ShellWrapper extends StatelessWidget {
 // GO ROUTER CONFIGURATION
 // =============================================================================
 class AppRouter {
-  // Key untuk navigasi global (Full-screen pages, e.g., Login, Settings)
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
-  // Key untuk ShellRoute (Bottom Navigation Bar)
   static final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
   static final GoRouter router = GoRouter(
@@ -96,32 +180,24 @@ class AppRouter {
       final bool isLoggedIn = authState.user != null;
       final String goingTo = state.matchedLocation;
 
-      // Menggunakan rute dari AppRoutes untuk menghindari error jika AppRoutes.root == '/'
       final bool isAuthPage =
           goingTo == AppRoutes.login || goingTo == AppRoutes.forgotPassword;
 
       if (isCheckingAuth) {
-        // Jika masih loading, GoRouter akan menunggu. (Tergantung implementasi Splash Screen)
         return null;
       }
 
-      // 1. SKENARIO: Sudah Login, tapi mencoba mengakses halaman Login/Auth.
       if (isLoggedIn && isAuthPage) {
-        // Redirect ke halaman utama aplikasi yang memiliki Bottom Bar
+        // Redirect ke halaman Cluster setelah login sukses
         return AppRoutes.cluster;
       }
 
-      // 2. SKENARIO: Belum Login, tapi mencoba mengakses halaman yang dilindungi.
-      // Kita asumsikan semua halaman selain Login/Forgot adalah halaman yang dilindungi.
-      // Karena kita menggunakan ShellRoute, rute yang dilindungi adalah rute Shell.
       final bool isProtectedPage = !isAuthPage;
 
       if (!isLoggedIn && isProtectedPage) {
-        // Redirect kembali ke halaman Login
         return AppRoutes.login;
       }
 
-      // 3. SKENARIO: Tidak perlu redirect (tetap di halaman yang dituju)
       return null;
     },
 
@@ -142,67 +218,80 @@ class AppRouter {
         builder: (context, state) => const ForgotPasswordPage(),
       ),
 
+      // Rute Onboarding (Diasumsikan ini adalah halaman splash atau intro)
+      GoRoute(
+        path: AppRoutes.cluster,
+        builder: (context, state) => const OnboardingPage(),
+      ),
+
+      // Rute Edit Device Name (Diletakkan di Root karena biasanya full screen)
+      GoRoute(
+        path:
+            '/${AppRoutes.editDeviceName}', // Perlu slash di depan karena di root
+        builder: (context, state) =>
+            const Placeholder(), // Ganti dengan EditDeviceNamePage
+      ),
+
       // -----------------------------------------------------------------------
       // 2. SHELL ROUTE: Container untuk Bottom Navigation Bar
       // -----------------------------------------------------------------------
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) {
-          // 'child' adalah widget dari rute yang aktif (ClusterPage, SitesPage, dll)
           return ShellWrapper(child: child);
         },
         routes: [
           // ** TAB 1: CLUSTER **
           GoRoute(
-            path: AppRoutes.cluster,
-            builder: (context, state) => const OnboardingPage(),
-            // Catatan: Jika OnboardingPage adalah halaman sekali lihat,
-            // sebaiknya letakkan logic penampilannya di redirect atau di ClusterPage.
+            path: AppRoutes.dashboard,
+            builder: (context, state) => const DashboardPage(),
+          ),
+
+          GoRoute(
+            path: AppRoutes.activity,
+            builder: (context, state) => const ActivityPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.analysis,
+            builder: (context, state) => const AnalysisPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.data,
+            builder: (context, state) => const DataPage(),
           ),
 
           // ** TAB 2: SITES **
-          GoRoute(
-            path: AppRoutes.sites,
-            builder: (context, state) {
-              // Parsing state.extra untuk data OnboardingItem
-              final cluster = state.extra is Map<String, dynamic>
-                  ? (state.extra as Map<String, dynamic>)['cluster']
-                        as OnboardingItem?
-                  : null;
-              return SitesPage(cluster: cluster);
-            },
-            // Sub-route di bawah Sites (Contoh: edit-device-name)
-            routes: [
-              GoRoute(
-                path: AppRoutes.editDeviceName, // Path: /sites/edit-device-name
-                builder: (context, state) =>
-                    const Placeholder(), // Ganti dengan halaman EditDeviceNamePage
-              ),
-            ],
-          ),
+          // GoRoute(
+          //   path: AppRoutes.sites,
+          //   builder: (context, state) {
+          //     final cluster = state.extra is OnboardingItem
+          //         ? state.extra as OnboardingItem
+          //         : null;
+          //     // Catatan: SitesPage menggunakan 'cluster' di constructor.
+          //     return SitesPage(cluster: cluster);
+          //   },
+          // ),
 
           // ** TAB 3: DASHBOARD **
-          GoRoute(
-            path: AppRoutes.dashboard,
-            builder: (context, state) => const DashboardPage(),
-            // Sub-route di bawah Dashboard (Profile)
-            routes: [
-              GoRoute(
-                // Path: /dashboard/profile
-                path: AppRoutes.profile,
-                builder: (context, state) => const ProfilePage(),
-              ),
-            ],
-          ),
+          // GoRoute(
+          //   path: AppRoutes.dashboard,
+          //   builder: (context, state) => const DashboardPage(),
+          //   // Sub-route di bawah Dashboard
+          //   routes: [
+          //     GoRoute(
+          //       // Path: /dashboard/profile
+          //       path: AppRoutes.profile,
+          //       builder: (context, state) => const ProfilePage(),
+          //     ),
+          //   ],
+          // ),
 
           // ** TAB 4: ALERT **
           GoRoute(
             path: AppRoutes.alert,
             builder: (context, state) {
-              // Parsing state.extra untuk data OnboardingItem
-              final cluster = state.extra is Map<String, dynamic>
-                  ? (state.extra as Map<String, dynamic>)['cluster']
-                        as OnboardingItem?
+              final cluster = state.extra is OnboardingItem
+                  ? state.extra as OnboardingItem
                   : null;
               return AlertInformationPage(cluster: cluster);
             },
@@ -211,20 +300,21 @@ class AppRouter {
       ),
 
       // -----------------------------------------------------------------------
-      // 3. FULL-SCREEN SETTINGS ROUTES (Root Navigator)
+      // 3. FULL-SCREEN SETTINGS ROUTES (Root Navigator - Di luar Shell)
       // -----------------------------------------------------------------------
       GoRoute(
         path: AppRoutes.settings,
-        builder: (context, state) =>
-            const ProfilePage(), // Asumsi ProfilePage adalah entry point Setting atau Profile utama
+        // Entry point untuk Settings
+        builder: (context, state) => const ProfilePage(),
         routes: [
           GoRoute(
-            // Path: /settings/change-password
+            // Navigasi di root navigator (Full screen)
+            parentNavigatorKey: _rootNavigatorKey,
             path: AppRoutes.changePassword,
             builder: (context, state) => const ChangePasswordPage(),
           ),
           GoRoute(
-            // Path: /settings/language-settings
+            parentNavigatorKey: _rootNavigatorKey,
             path: AppRoutes.languageSettings,
             builder: (context, state) => const LanguageSettingPage(),
           ),

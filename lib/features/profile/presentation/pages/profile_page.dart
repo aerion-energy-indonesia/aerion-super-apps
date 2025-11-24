@@ -1,207 +1,289 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:aerion_dashboard/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:provider/provider.dart';
 
-class ProfilePage extends StatefulWidget {
+// Asumsi: Path ke AuthNotifier dan AppRoutes sudah benar
+import '../../../auth/presentation/providers/auth_notifier.dart';
+import '../../../../routes/app_routes.dart';
+// Import widget/halaman yang diperlukan
+
+// --- ASUMSI: DEFINISI SVG ICON HELPER (diambil dari AppRouter/MainScaffold) ---
+// Ini harus dipindahkan ke file utilitas di proyek Anda agar dapat diakses
+import 'package:flutter_svg/flutter_svg.dart';
+
+class SvgBottomBarIcon extends StatelessWidget {
+  final String assetPath;
+  final Color color;
+  final double size;
+
+  const SvgBottomBarIcon({
+    super.key,
+    required this.assetPath,
+    required this.color,
+    this.size = 24.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SvgPicture.asset(
+      assetPath,
+      // colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+      width: size,
+      height: size,
+      placeholderBuilder: (BuildContext context) =>
+          Icon(Icons.error, color: color),
+    );
+  }
+}
+// --- END ASUMSI SVG ICON HELPER ---
+
+class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
-}
+  // Warna dan Konstanta
+  static const Color primaryTextColor = Color(0xFF364153);
+  static const Color accentColor = Color(0xFF00305E);
+  static const Color logoutColor = Color(0xFFE41E26); // Merah untuk Logout
 
-class _ProfilePageState extends State<ProfilePage> {
-  // Listener untuk menangani logout dan error
-  late VoidCallback _listener;
+  // Widget Pembantu untuk Opsi Pengaturan
+  Widget _buildSettingOption({
+    required BuildContext context,
+    required String assetPath, // Menggunakan path aset SVG
+    required String title,
+    required String route,
+    Color iconColor = primaryTextColor,
+    bool isLogout = false,
+  }) {
+    // Aksi yang akan dipanggil saat item diklik
+    final VoidCallback onTapAction = isLogout
+        ? () {
+            // Panggil fungsi logout dari AuthNotifier
+            Provider.of<AuthNotifier>(context, listen: false).signOut();
+            context.go(AppRoutes.login); // Arahkan ke Login Page
+          }
+        : () {
+            // Navigasi ke rute tujuan (Diasumsikan rute di luar Shell adalah root-level)
+            // Untuk rute pengaturan, kita gunakan /settings/sub-route
+            context.go('${AppRoutes.settings}/$route');
+          };
 
-  @override
-  void initState() {
-    super.initState();
-    _listener = () {
-      final notifier = context.read<AuthNotifier>();
-      final state = notifier.state;
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 4.0,
+        ),
 
-      // Cek jika terjadi error
-      if (state.error != null) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.error!), backgroundColor: Colors.red),
-          );
-          notifier.resetError();
-        });
-      }
+        // MENGGANTI ICON DENGAN SVG ICON BUILDER
+        leading: SvgBottomBarIcon(
+          assetPath: assetPath,
+          color: iconColor,
+          size: 24,
+        ),
 
-      // Cek jika user berhasil Sign Out (user == null dan tidak sedang loading)
-      // Kita asumsikan setelah logout, kita redirect ke halaman login ('/login')
-      if (state.user == null && !state.isSigningOut && !state.isLoading) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.go('/login');
-        });
-      }
-    };
-
-    // Tambahkan listener
-    context.read<AuthNotifier>().addListener(_listener);
-  }
-
-  @override
-  void dispose() {
-    context.read<AuthNotifier>().removeListener(_listener);
-    super.dispose();
-  }
-
-  void _signOut() {
-    context.read<AuthNotifier>().signOut();
+        title: Text(
+          title,
+          style: TextStyle(
+            fontSize: 16,
+            color: isLogout ? logoutColor : primaryTextColor,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        trailing: isLogout
+            ? null // Tidak ada panah untuk Logout
+            : const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey),
+        onTap: onTapAction,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<AuthNotifier>().state;
+    // Ambil data user dari AuthNotifier untuk tampilan header
+    final authState = context.watch<AuthNotifier>().state;
+    final user = authState.user;
+
+    final String username = user?.username ?? 'Pengguna Tidak Dikenal';
+    final String email = user?.email ?? 'email@komatsu.com';
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profil Pengguna'),
-        backgroundColor: Colors.white,
-        elevation: 1,
-      ),
       backgroundColor: Colors.grey[100],
-      body: state.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
+      appBar: AppBar(
+        title: const Text(
+          'Setting',
+          style: TextStyle(
+            color: primaryTextColor,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryTextColor),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // =========================================================
+            // 1. Header Profil & Edit Data
+            // =========================================================
+            Container(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              color: Colors.white,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // --- Bagian Header Profil ---
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          blurRadius: 5,
+                  Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 30,
+                        backgroundColor: accentColor,
+                        child: Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: 36,
                         ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.blue.shade100,
-                          child: Icon(
-                            Icons.person,
-                            size: 40,
-                            color: Colors.blue.shade800,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          state.user?.email ??
-                              'User ID: ${state.user?.uid ?? "Loading..."}',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          state.user?.uid ?? 'Tidak ada UID',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  // --- Bagian Pengaturan dan Logout ---
-                  const Text(
-                    'Akun dan Pengaturan',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black54,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // ListTile Aksi (Contoh)
-                  _buildProfileTile(
-                    icon: Icons.vpn_key_outlined,
-                    title: 'Ganti Kata Sandi',
-                    onTap: () {
-                      // Arahkan ke halaman ganti password (opsional)
-                      context.go('/change-password');
-                    },
-                  ),
-                  _buildProfileTile(
-                    icon: Icons.language,
-                    title: 'Bahasa',
-                    onTap: () {
-                      // Arahkan ke halaman pengaturan bahasa
-                      context.go('/language');
-                    },
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Tombol Logout
-                  ElevatedButton.icon(
-                    onPressed: state.isSigningOut ? null : _signOut,
-                    icon: state.isSigningOut
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Icon(Icons.logout, color: Colors.white),
-                    label: Text(
-                      state.isSigningOut ? 'Logging out...' : 'Logout',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
                       ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.shade700,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            username,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: primaryTextColor,
+                            ),
+                          ),
+                          Text(
+                            email,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  // Tombol Edit Data
+                  TextButton(
+                    onPressed: () {
+                      // MENGGUNAKAN RUTE FULL-SCREEN
+                      context.go('/${AppRoutes.sites}');
+                    },
+                    child: const Text(
+                      'Edit Data',
+                      style: TextStyle(
+                        color: accentColor,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-    );
-  }
 
-  Widget _buildProfileTile({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: ListTile(
-        leading: Icon(icon, color: Colors.blueGrey),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
-          size: 16,
-          color: Colors.grey,
+            const SizedBox(height: 16),
+
+            // =========================================================
+            // 2. Daftar Opsi Pengaturan
+            // =========================================================
+            Container(
+              color: Colors.white,
+              child: Column(
+                children: [
+                  // Opsi 1: Change Cluster
+                  _buildSettingOption(
+                    context: context,
+                    assetPath: 'assets/svg/maps.svg',
+                    title: 'Change Cluster',
+                    route: 'change-cluster', // Asumsi: Sub-route dari /settings
+                  ),
+                  const Divider(
+                    height: 0,
+                    thickness: 0.5,
+                    indent: 16,
+                    endIndent: 16,
+                  ),
+
+                  // Opsi 2: Change Password
+                  _buildSettingOption(
+                    context: context,
+                    assetPath: 'assets/svg/password.svg',
+                    title: 'Change Password',
+                    route: AppRoutes.changePassword,
+                  ),
+                  const Divider(
+                    height: 0,
+                    thickness: 0.5,
+                    indent: 16,
+                    endIndent: 16,
+                  ),
+
+                  // Opsi 3: Language Setting
+                  _buildSettingOption(
+                    context: context,
+                    assetPath: 'assets/svg/language.svg',
+                    title: 'Language Setting',
+                    route: AppRoutes.languageSettings,
+                  ),
+                  const Divider(
+                    height: 0,
+                    thickness: 0.5,
+                    indent: 16,
+                    endIndent: 16,
+                  ),
+
+                  // Opsi 4: About Us
+                  _buildSettingOption(
+                    context: context,
+                    assetPath: 'assets/svg/about.svg',
+                    title: 'About Us',
+                    route: AppRoutes.sites, // Asumsi: Rute di luar Shell
+                  ),
+                  const Divider(
+                    height: 0,
+                    thickness: 0.5,
+                    indent: 16,
+                    endIndent: 16,
+                  ),
+
+                  // Opsi 5: Help
+                  _buildSettingOption(
+                    context: context,
+                    assetPath: 'assets/svg/help.svg',
+                    title: 'Help',
+                    route: AppRoutes.sites,
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // =========================================================
+            // 3. Opsi Logout
+            // =========================================================
+            Container(
+              color: Colors.white,
+              child: _buildSettingOption(
+                context: context,
+                assetPath: 'assets/svg/logout.svg',
+                title: 'Logout',
+                route: '', // Tidak digunakan untuk Logout
+                iconColor: logoutColor,
+                isLogout: true,
+              ),
+            ),
+          ],
         ),
-        onTap: onTap,
       ),
     );
   }

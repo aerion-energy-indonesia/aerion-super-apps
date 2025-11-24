@@ -18,7 +18,7 @@ class AppRoutes {
 
   // --- DASHBOARD / PROFILE SUB-ROUTES ---
   // Rute di bawah Dashboard/Profile yang mungkin tidak memiliki Bottom Bar.
-  static const String profile = 'profile'; // Sub-route dari /dashboard
+  static const String profile = '/profile';
 
   // --- GLOBAL SETTINGS ROUTES (Root Navigator) ---
   // Rute pengaturan yang menutupi seluruh layar, tidak terikat ShellRoute.
@@ -31,4 +31,8 @@ class AppRoutes {
   // Contoh rute detail/aksi
   static const String editDeviceName =
       'edit-device-name'; // Sub-route, misalnya, dari /sites
+
+  static const String data = '/data';
+  static const String analysis = '/analysis';
+  static const String activity = '/activity';
 }

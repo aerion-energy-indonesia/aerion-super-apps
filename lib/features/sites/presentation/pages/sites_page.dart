@@ -143,7 +143,6 @@ class _SitesPageState extends State<SitesPage> {
       backgroundColor: Colors.grey[100], // Background terang
       // Hapus AppBar default, kita buat kustom di Body
       body: _buildBody(),
-      bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 

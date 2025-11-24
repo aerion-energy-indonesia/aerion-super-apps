@@ -34,7 +34,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
         hoverColor: Colors.white,
         onTap: () {
           // Logika navigasi atau aksi saat item diklik
-          context.go('/sites', extra: {'cluster': item});
+          context.go('/dashboard');
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(

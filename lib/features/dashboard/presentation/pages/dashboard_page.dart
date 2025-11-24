@@ -1,140 +1,687 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../widgets/summary_card.dart';
-import '../widgets/recent_activity.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+// Asumsikan path widgets ini benar. Saya akan membuat implementasi mock/placeholder di bawah.
+// import '../widgets/summary_card.dart';
+// import '../widgets/recent_activity.dart';
 
-// Definisi Model data (placeholder)
-class DashboardSummary {
-  final String title;
-  final int value;
-  final IconData icon;
-  final Color color;
+// Model dasar untuk data yang ditampilkan di halaman
+class DashboardData {
+  final String clusterName;
+  final String siteName;
+  final String siteAddress;
 
-  DashboardSummary({
-    required this.title,
-    required this.value,
-    required this.icon,
-    required this.color,
+  DashboardData({
+    required this.clusterName,
+    required this.siteName,
+    required this.siteAddress,
   });
 }
+
+// =========================================================================
+// WIDGET PLACEHOLDER/HELPER (Harus dipindahkan ke file terpisah di aplikasi nyata)
+// =========================================================================
+
+// Widget kecil untuk menampilkan Key-Value Pair (seperti PV Output)
+class KeyValueItem extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color valueColor;
+
+  const KeyValueItem({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.icon,
+    this.valueColor = const Color(0xFF10B981), // Default Green
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 16, color: valueColor),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: valueColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// =========================================================================
+// WIDGET UTAMA
+// =========================================================================
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
 
-  // Data mock untuk kartu ringkasan
-  List<DashboardSummary> _getSummaries() {
-    return [
-      DashboardSummary(
-        title: 'Total Cabang',
-        value: 125,
-        icon: Icons.business,
-        color: Colors.blue,
-      ),
-      DashboardSummary(
-        title: 'Status Normal',
-        value: 102,
-        icon: Icons.check_circle_outline,
-        color: Colors.green,
-      ),
-      DashboardSummary(
-        title: 'Offline',
-        value: 15,
-        icon: Icons.offline_bolt,
-        color: Colors.red,
-      ),
-      DashboardSummary(
-        title: 'Maintenance',
-        value: 8,
-        icon: Icons.build_circle_outlined,
-        color: Colors.orange,
-      ),
-    ];
+  static const Color primaryTextColor = Color(0xFF364153);
+  static const Color accentGreen = Color(0xFF10B981);
+  static const Color accentRed = Color(0xFFE41E26);
+  static const Color komatsuBlue = Color(0xFF00305E);
+  static const Color secondaryTextColor = Colors.grey;
+
+  // Data mock halaman
+  DashboardData _getMockData() {
+    return DashboardData(
+      clusterName: 'KUI Cikarang',
+      siteName: 'Plant A',
+      siteAddress:
+          'Jl. Gatot Subroto No. Kav. 52, Kuningan Barat, Jakarta Selatan',
+    );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text('Dashboard Overview'),
-        backgroundColor: Colors.white,
-        elevation: 1,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.black54),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.person_outline, color: Colors.black54),
-            onPressed: () {
-              context.go('/dashboard/profile');
-            },
-          ),
-        ],
-      ),
-      // Menggunakan SingleChildScrollView untuk responsivitas
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
+  // Widget Header Tanggal & Pengaturan (Seperti di halaman Analysis)
+  Widget _buildCustomAppBar(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 8),
+        color: Colors.white,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
             const Text(
-              'Ringkasan Status Jaringan',
+              '24 November 2025', // Tanggal Saat Ini
               style: TextStyle(
-                fontSize: 20,
+                color: primaryTextColor,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
               ),
             ),
-            const SizedBox(height: 16),
-
-            // Bagian Kartu Ringkasan (Responsive Grid)
-            _buildSummaryGrid(context, _getSummaries()),
-
-            const SizedBox(height: 30),
-
-            // Bagian Aktivitas Terbaru
-            const Text(
-              'Aktivitas Terbaru',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
+            IconButton(
+              icon: SvgPicture.asset('assets/svg/settings.svg'),
+              onPressed: () {
+                context.go('/settings');
+              },
             ),
-            const SizedBox(height: 16),
-            const RecentActivity(),
           ],
         ),
       ),
     );
   }
 
-  // Metode untuk membangun GridView yang responsif
-  Widget _buildSummaryGrid(
-    BuildContext context,
-    List<DashboardSummary> summaries,
-  ) {
-    // Hitung lebar layar untuk menentukan jumlah kolom
-    final screenWidth = MediaQuery.of(context).size.width;
-    // Tentukan jumlah kolom: 2 untuk mobile, 3 atau 4 untuk tablet/desktop
-    final crossAxisCount = screenWidth > 600 ? 4 : 2;
+  // Bagian Header Situs & Diagram
+  Widget _buildSiteHeaderAndDiagram(BuildContext context, DashboardData data) {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Info Perusahaan
+          Row(
+            children: [
+              const Icon(
+                Icons.business_center,
+                color: komatsuBlue,
+                size: 24,
+              ), // Placeholder Logo
+              const SizedBox(width: 8),
+              Text(
+                'KOMATSU',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: komatsuBlue,
+                ),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: () {
+                  // Navigasi ke halaman Edit Site/Cluster
+                },
+                child: const Text(
+                  'Change Sites',
+                  style: TextStyle(color: komatsuBlue, fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
 
-    return GridView.builder(
-      shrinkWrap:
-          true, // Wajib diatur jika berada di dalam SingleChildScrollView
-      physics:
-          const NeverScrollableScrollPhysics(), // Nonaktifkan scroll GridView
-      itemCount: summaries.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        crossAxisSpacing: 16.0,
-        mainAxisSpacing: 16.0,
-        childAspectRatio: 1.2, // Aspek rasio kartu (tinggi/lebar)
+          // Nama & Alamat Situs
+          Text(
+            data.siteName,
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: primaryTextColor,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            data.siteAddress,
+            style: TextStyle(fontSize: 13, color: secondaryTextColor),
+          ),
+          const SizedBox(height: 16),
+
+          // Placeholder Diagram Sistem (Image/Simulasi)
+          Container(
+            height: 180,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Center(
+              child: Text(
+                'Simulasi Diagram Sistem Hybrid Energi',
+                style: TextStyle(color: secondaryTextColor),
+              ),
+            ),
+          ),
+        ],
       ),
-      itemBuilder: (context, index) {
-        return SummaryCard(summary: summaries[index]);
-      },
+    );
+  }
+
+  // Bagian Current Load
+  Widget _buildCurrentLoadPanel() {
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Current Load',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: primaryTextColor,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: accentGreen,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '9.993 kW',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: accentGreen,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildLoadMetric('Total Load', '10.221 kW', secondaryTextColor),
+                _buildLoadMetric(
+                  'Average Load',
+                  '9.512 kW',
+                  secondaryTextColor,
+                ),
+                _buildLoadMetric('Min Load', '8.981 kW', secondaryTextColor),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Widget Pembantu untuk Metrik Load
+  Widget _buildLoadMetric(String label, String value, Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(fontSize: 12, color: color)),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: primaryTextColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Bagian Current Power
+  Widget _buildCurrentPowerPanel() {
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Current Power',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: primaryTextColor,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: accentGreen,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '9.946 kW',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: accentGreen,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Grid 2x4 untuk Power Sources
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              childAspectRatio: 3, // Mengatur rasio agar item lebih lebar
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 16,
+              children: [
+                // Source 1: PV
+                KeyValueItem(
+                  label: 'PV Output',
+                  value: '0.320 kW',
+                  icon: Icons.wb_sunny,
+                  valueColor: accentGreen,
+                ),
+                // Source 2: PV from HVDS Tower
+                KeyValueItem(
+                  label: 'PV from HVDS Tower',
+                  value: '1.100 kW',
+                  icon: Icons.wifi,
+                  valueColor: accentGreen,
+                ),
+                // Source 3: Bus Tracking System
+                KeyValueItem(
+                  label: 'Bus Tracking System',
+                  value: '0.282 kW',
+                  icon: Icons.directions_bus,
+                  valueColor: accentGreen,
+                ),
+                // Source 4: Battery Package
+                KeyValueItem(
+                  label: 'Battery Package',
+                  value: '6.520 kW',
+                  icon: Icons.battery_charging_full,
+                  valueColor: accentGreen,
+                ),
+                // Source 5: Electricity
+                KeyValueItem(
+                  label: 'Electricity',
+                  value: '0.490 kW',
+                  icon: Icons.bolt,
+                  valueColor: accentGreen,
+                ),
+                // Source 6: Wall Mounted Flex PV
+                KeyValueItem(
+                  label: 'Wall Mounted Flex PV',
+                  value: '1.520 kW',
+                  icon: Icons.power,
+                  valueColor: accentGreen,
+                ),
+                // Source 7: Primary
+                KeyValueItem(
+                  label: 'Primary',
+                  value: '0.347 kW',
+                  icon: Icons.star,
+                  valueColor: accentRed,
+                ),
+                // Source 8: Grid PLM
+                KeyValueItem(
+                  label: 'Grid PLM',
+                  value: '0.436 kW',
+                  icon: Icons.grid_on,
+                  valueColor: accentRed,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Bagian Load Supply Today
+  Widget _buildLoadSupplyPanel() {
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Load Supply Today',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: primaryTextColor,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              '17.215 kWh',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w900,
+                color: primaryTextColor,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Total Supply Energy',
+              style: TextStyle(fontSize: 13, color: secondaryTextColor),
+            ),
+            // Anda dapat menambahkan placeholder chart di sini jika diperlukan
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Bagian Battery Overview
+  Widget _buildBatteryOverviewPanel() {
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Overview Battery',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: primaryTextColor,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Placeholder Circular Chart
+                SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      CircularProgressIndicator(
+                        value: 1.0, // Full
+                        strokeWidth: 8,
+                        backgroundColor: Colors.grey.shade200,
+                        valueColor: AlwaysStoppedAnimation<Color>(accentGreen),
+                      ),
+                      const Text(
+                        '100%',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'SOC (State of Charge)',
+                      style: TextStyle(fontSize: 14, color: secondaryTextColor),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '100%',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: primaryTextColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Detail Baterai (Tabel)
+            _buildBatteryDetailRow('Status', 'Full Charged', accentGreen),
+            _buildBatteryDetailRow(
+              'Daily Charging Volume',
+              '29 kWh',
+              primaryTextColor,
+            ),
+            _buildBatteryDetailRow(
+              'Battery Temperature',
+              '28 °C',
+              primaryTextColor,
+            ),
+            _buildBatteryDetailRow(
+              'State of Health (SOH)',
+              'Excellent',
+              accentGreen,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Widget Pembantu untuk Detail Baris Baterai
+  Widget _buildBatteryDetailRow(String label, String value, Color valueColor) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(fontSize: 14, color: secondaryTextColor),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: valueColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Bagian Carbon Reduction
+  Widget _buildCarbonReductionPanel() {
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Carbon Reduction Today',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: primaryTextColor,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '62 kg',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    color: primaryTextColor,
+                  ),
+                ),
+                Text(
+                  '6.85 kg',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    color: accentGreen,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Total Carbon Reduction',
+                  style: TextStyle(fontSize: 13, color: secondaryTextColor),
+                ),
+                Text(
+                  'Total Revenue 124.790.212 IDR',
+                  style: TextStyle(fontSize: 13, color: secondaryTextColor),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Placeholder Bar Chart (Simulasi)
+            Container(
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(child: Text('Simulasi Bar Chart Carbon')),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final data = _getMockData();
+
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      // Body tidak menggunakan SingleChildScrollView karena ShellWrapper akan menyediakannya
+      // Tapi karena kita ingin CustomAppBar, kita gunakan CustomScrollView
+      body: CustomScrollView(
+        slivers: [
+          SliverList(
+            delegate: SliverChildListDelegate([
+              // 1. Custom AppBar (Hanya bagian Tanggal/Setting)
+              _buildCustomAppBar(context),
+
+              // 2. Header Situs dan Diagram
+              _buildSiteHeaderAndDiagram(context, data),
+
+              // 3. Konten Utama Dashboard (Padding luar)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    const SizedBox(height: 16),
+
+                    // Current Load
+                    _buildCurrentLoadPanel(),
+
+                    const SizedBox(height: 24),
+
+                    // Current Power
+                    _buildCurrentPowerPanel(),
+
+                    const SizedBox(height: 24),
+
+                    // Load Supply Today
+                    _buildLoadSupplyPanel(),
+
+                    const SizedBox(height: 24),
+
+                    // Battery Overview
+                    _buildBatteryOverviewPanel(),
+
+                    const SizedBox(height: 24),
+
+                    // Carbon Reduction Today
+                    _buildCarbonReductionPanel(),
+
+                    const SizedBox(height: 50),
+                  ],
+                ),
+              ),
+            ]),
+          ),
+        ],
+      ),
     );
   }
 }

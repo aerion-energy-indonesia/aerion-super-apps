@@ -49,6 +49,7 @@ dependencies:
   shared_preferences: ^2.5.3
   flutter_launcher_icons: ^0.14.4
   font_awesome_flutter: ^10.12.0
+  flutter_svg: ^2.2.2
 
 dev_dependencies:
   flutter_test:
@@ -134,6 +135,21 @@ flutter:
         - assets/images/icons/alert_triangle.png    
         - assets/images/icons/monitor.png
         - assets/images/icons/user.png
+        - assets/svg/alert-triangle.svg
+        - assets/svg/grid.svg
+        - assets/svg/pie-chart.svg
+        - assets/svg/activity.svg
+        - assets/svg/file.svg
+        - assets/svg/settings.svg
+        - assets/svg/profile.svg
+        - assets/svg/password.svg
+        - assets/svg/maps.svg
+        - assets/svg/about.svg
+        - assets/svg/help.svg
+        - assets/svg/language.svg
+        - assets/svg/logout.svg
+        - assets/svg/language.svg
+
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
