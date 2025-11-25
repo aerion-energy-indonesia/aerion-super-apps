@@ -26,6 +26,7 @@ class AppRoutes {
 
   // Sub-routes di bawah /settings (untuk navigasi bersarang)
   static const String aboutUs = 'about-us';
+  static const String changeCluster = 'change-cluster';
   static const String changePassword = 'change-password';
   static const String changeProfile = 'change-profile';
   static const String languageSettings = 'language-settings';

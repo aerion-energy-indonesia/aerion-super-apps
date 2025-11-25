@@ -1,3 +1,4 @@
+import 'package:aerion_dashboard/features/cluster/presentation/pages/cluster_page.dart';
 import 'package:aerion_dashboard/features/profile/presentation/pages/about_us_page.dart';
 import 'package:aerion_dashboard/features/profile/presentation/pages/help_page.dart';
 import 'package:aerion_dashboard/features/profile/presentation/pages/language_setting_page.dart';
@@ -10,8 +11,6 @@ import 'package:aerion_dashboard/features/auth/presentation/pages/login_page.dar
 import 'package:aerion_dashboard/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:aerion_dashboard/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:aerion_dashboard/features/profile/presentation/pages/change_profile_page.dart';
-// Note: Perlu mengimpor ClusterPage. Saya asumsikan path-nya sama dengan Dashboard/Sites
-// import 'package:aerion_dashboard/features/cluster/presentation/pages/cluster_page.dart';
 import 'package:aerion_dashboard/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:aerion_dashboard/features/profile/presentation/pages/profile_page.dart';
 import 'package:aerion_dashboard/features/auth/presentation/pages/change_password_page.dart';
@@ -316,6 +315,12 @@ class AppRouter {
             parentNavigatorKey: _rootNavigatorKey,
             path: AppRoutes.changeProfile,
             builder: (context, state) => const EditProfilePage(),
+          ),
+          // Change Cluster Page
+          GoRoute(
+            parentNavigatorKey: _rootNavigatorKey,
+            path: AppRoutes.changeCluster,
+            builder: (context, state) => const ClusterPage(),
           ),
           // Change Password Page
           GoRoute(

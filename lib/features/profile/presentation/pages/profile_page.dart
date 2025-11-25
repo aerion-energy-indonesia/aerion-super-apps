@@ -197,7 +197,7 @@ class ProfilePage extends StatelessWidget {
                     context: context,
                     assetPath: 'assets/svg/maps.svg',
                     title: 'Change Cluster',
-                    route: 'change-cluster', // Asumsi: Sub-route dari /settings
+                    route: AppRoutes.changeCluster,
                   ),
                   const Divider(
                     height: 0,

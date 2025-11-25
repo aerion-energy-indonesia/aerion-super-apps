@@ -1,62 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-// =========================================================================
-// MODEL & ENUM (Tidak Berubah Signifikan, hanya penamaan status)
-// =========================================================================
-
-class Cluster {
-  final String id; // Digunakan sebagai SN
-  final String name; // Nama Cabang/Pusat
-  final String address; // Alamat detail
-  final ClusterStatus status;
-
-  Cluster({
-    required this.id,
-    required this.name,
-    required this.address,
-    required this.status,
-  });
-}
-
-// Mengganti nama enum agar lebih sesuai dengan visual (Normal/Offline)
-enum ClusterStatus { all, normal, offline, maintenance }
-
-// =========================================================================
-// UTILITIES
-// =========================================================================
-
-// Utility untuk mendapatkan warna berdasarkan status
-Color _statusColor(ClusterStatus status) {
-  switch (status) {
-    case ClusterStatus.normal:
-      return Colors.green;
-    case ClusterStatus.offline:
-      return Colors.red;
-    case ClusterStatus.maintenance:
-      return Colors.orange;
-    case ClusterStatus.all:
-      return Colors.blueGrey;
-  }
-}
-
-// Utility untuk mendapatkan teks label status
-String _statusLabel(ClusterStatus status) {
-  switch (status) {
-    case ClusterStatus.normal:
-      return 'Normal';
-    case ClusterStatus.offline:
-      return 'Offline';
-    case ClusterStatus.maintenance:
-      return 'Maintenance';
-    case ClusterStatus.all:
-      return 'All';
-  }
-}
-
-// =========================================================================
-// WIDGET UTAMA
-// =========================================================================
+import 'package:provider/provider.dart';
+import 'package:aerion_dashboard/features/onboarding/domain/entities/onboarding_item.dart';
+import 'package:aerion_dashboard/app_state.dart';
+import 'package:aerion_dashboard/widgets/app_bar.dart';
 
 class ClusterPage extends StatefulWidget {
   const ClusterPage({super.key});
@@ -66,224 +13,53 @@ class ClusterPage extends StatefulWidget {
 }
 
 class _ClusterPageState extends State<ClusterPage> {
-  // Menghapus _searchController dan filter logic karena tidak ada di desain yang diberikan.
-  List<Cluster> _allClusters = [];
-
   @override
   void initState() {
     super.initState();
-    // Mengganti _allClusters dengan data mock baru yang lebih detail
-    _allClusters = _mockClusters();
+    // load items when widget appears
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AppState>().loadItems();
+    });
   }
 
-  // Menghapus _applyFilters, _setFilter, _clearSearch, dan _buildFilterMenu
-  // karena tidak relevan dengan desain statis yang diminta.
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  // MOCK DATA: Diperbarui agar sesuai dengan data di desain
-  List<Cluster> _mockClusters() {
-    return [
-      Cluster(
-        id: '534315325189731024',
-        name: 'Kantor Pusat Jakarta',
-        address:
-            'JL Gatot Subroto No. Kav. 52, Kuningan Barat, Jakarta Selatan',
-        status: ClusterStatus.normal,
-      ),
-      Cluster(
-        id: '1362426426452321',
-        name: 'Kantor Pusat Bandung',
-        address: 'JL Japati No. 1, Bandung',
-        status: ClusterStatus.offline,
-      ),
-      Cluster(
-        id: '998877665544332211',
-        name: 'Cabang Surabaya',
-        address: 'JL A Yani No. 100, Surabaya',
-        status: ClusterStatus.maintenance,
-      ),
-      Cluster(
-        id: '112233445566778899',
-        name: 'Cabang Medan',
-        address: 'JL Sisingamangaraja No. 5, Medan',
-        status: ClusterStatus.normal,
-      ),
-    ];
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100], // Background terang
-      appBar: _buildAppBar(),
-      body: _buildBody(),
-    );
-  }
-
-  // --- Bagian AppBar (Sesuai Desain Gambar) ---
-  AppBar _buildAppBar() {
-    return AppBar(
-      elevation: 0,
-      backgroundColor: Colors.white,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-        onPressed: () {
-          if (Navigator.of(context).canPop()) {
-            context.pop();
-          } else {
-            context.go('/onboarding');
-          }
-        },
-      ),
-      title: const Text(
-        'PT. Telkomsel', // Menggunakan nama perusahaan sebagai judul
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 18,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 16.0),
-          child: Row(
-            children: [
-              const Icon(Icons.flash_on, color: Colors.red),
-              const SizedBox(width: 4),
-              Text(
-                'Telkomsel',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  // --- Bagian Body (List Cabang) ---
-  Widget _buildBody() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: Text(
-            'Cabang List',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
-        ),
-        Expanded(
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: _allClusters.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final c = _allClusters[index];
-              return ClusterCard(cluster: c);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  // --- Placeholder Bottom Navigation Bar ---
-  Widget _buildBottomNavBar() {
-    return BottomNavigationBar(
-      elevation: 4,
-      selectedItemColor: Colors.red,
-      unselectedItemColor: Colors.grey,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.desktop_windows),
-          label: 'Monitor',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.warning_amber),
-          label: 'Alarm',
-        ),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
-      ],
-    );
-  }
-}
-
-// =========================================================================
-// WIDGET BARU: ClusterCard (Menggantikan Card/ListTile default)
-// =========================================================================
-
-class ClusterCard extends StatelessWidget {
-  final Cluster cluster;
-
-  const ClusterCard({required this.cluster, super.key});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildItemCard(OnboardingItem item) {
     return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      margin: EdgeInsets.zero,
+      color: Colors.white,
+      surfaceTintColor: Colors.white,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Colors.grey, width: 0.1),
+      ),
       child: InkWell(
+        hoverColor: Colors.white,
         onTap: () {
+          // Logika navigasi atau aksi saat item diklik
           context.go('/dashboard');
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(
-          //     content: Text(
-          //       'Detail ${cluster.name} (${_statusLabel(cluster.status)})',
-          //     ),
-          //   ),
-          // );
         },
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // SN dan Status Badge (Baris 1)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'SN: ${cluster.id}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  _StatusBadge(status: cluster.status),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              // Nama Lokasi (Baris 2)
-              Text(
-                cluster.name,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
+              Container(
+                height: 80,
+                alignment: Alignment.center,
+                // Menggunakan Icon dari CardItem
+                child: Image.asset(item.logoAsset, fit: BoxFit.contain),
               ),
               const SizedBox(height: 4),
-
-              // Alamat Detail (Baris 3)
               Text(
-                cluster.address,
-                style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                item.subtitle,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFF364153),
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                  fontFamily: 'GeisRegular',
+                ),
               ),
             ],
           ),
@@ -291,37 +67,90 @@ class ClusterCard extends StatelessWidget {
       ),
     );
   }
-}
 
-// =========================================================================
-// WIDGET BARU: _StatusBadge
-// =========================================================================
+  Widget _buildResponsiveList(
+    BuildContext context,
+    List<OnboardingItem> items,
+  ) {
+    // Tentukan lebar layar saat ini
+    final screenWidth = MediaQuery.of(context).size.width;
+    // Tentukan breakpoint (600px adalah breakpoint umum)
+    const breakpoint = 600.0;
 
-class _StatusBadge extends StatelessWidget {
-  final ClusterStatus status;
+    // Jumlah kolom: 1 untuk layar kecil, 3 untuk layar besar
+    final int crossAxisCount = screenWidth > breakpoint ? 3 : 1;
 
-  const _StatusBadge({required this.status});
+    if (items.isEmpty && !context.watch<AppState>().loading) {
+      return const Center(child: Text('Tidak ada item yang tersedia.'));
+    }
+
+    // Widget builder utama.
+    if (screenWidth > breakpoint) {
+      // Tampilan Grid untuk layar besar
+      return GridView.builder(
+        // Karena diletakkan di dalam SingleChildScrollView, kita harus:
+        shrinkWrap: true, // Membatasi ukuran GridView sesuai konten
+        physics:
+            const NeverScrollableScrollPhysics(), // Menonaktifkan scroll di GridView
+        itemCount: items.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount,
+          crossAxisSpacing: 16, // Jarak antar kolom
+          mainAxisSpacing: 16, // Jarak antar baris
+          childAspectRatio: 1.0, // Rasio aspek item (dapat disesuaikan)
+        ),
+        itemBuilder: (context, index) {
+          return _buildItemCard(items[index]);
+        },
+      );
+    } else {
+      // Tampilan List untuk layar kecil
+      return ListView.builder(
+        // Karena diletakkan di dalam SingleChildScrollView, kita harus:
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.only(
+              bottom: 16.0,
+            ), // Padding antar item List
+            child: _buildItemCard(items[index]),
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final color = _statusColor(status);
-    final label = _statusLabel(status);
+    final state = context.watch<AppState>();
+    const bgColor = Color(0xFFF4F4F5);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1), // Background transparan
-        borderRadius: BorderRadius.circular(5),
-        border: Border.all(color: color, width: 0.8),
+    return Scaffold(
+      backgroundColor: bgColor,
+      resizeToAvoidBottomInset: false,
+      appBar: CustomAppBar(
+        title: 'Cluster',
+        backgroundColor: Colors.white,
+        elevation: 0,
+        showBackButton: true,
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.bold,
-          fontSize: 11,
-        ),
-      ),
+      body: state.loading
+          ? const Center(child: CircularProgressIndicator())
+          : Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 24,
+                  horizontal: 24,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [_buildResponsiveList(context, state.items)],
+                ),
+              ),
+            ),
     );
   }
 }
