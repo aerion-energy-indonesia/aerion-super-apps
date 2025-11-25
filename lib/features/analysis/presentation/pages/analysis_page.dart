@@ -1,9 +1,20 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:aerion_dashboard/widgets/app_bar.dart'; // Import Custom AppBar
+import 'package:intl/intl.dart';
 
-class AnalysisPage extends StatelessWidget {
+class AnalysisPage extends StatefulWidget {
   const AnalysisPage({super.key});
+
+  @override
+  State<AnalysisPage> createState() => _AnalysisPageState();
+}
+
+class _AnalysisPageState extends State<AnalysisPage> {
+  late DateTime _currentDateTime;
+  Timer? _timer;
 
   // Warna dan Konstanta
   static const Color primaryTextColor = Color(0xFF364153);
@@ -11,39 +22,21 @@ class AnalysisPage extends StatelessWidget {
     0xFF10B981,
   ); // Warna hijau untuk grafik
 
-  // Widget Header Tanggal & Pengaturan
-  Widget _buildCustomAppBar(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 8),
-        color: Colors.white,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              '24 November 2025', // Tanggal Saat Ini
-              style: TextStyle(
-                color: primaryTextColor,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            IconButton(
-              icon: SvgPicture.asset(
-                'assets/svg/settings.svg',
-                width: 24,
-                height: 24,
-                color: primaryTextColor,
-              ),
-              onPressed: () {
-                // Aksi: Navigasi ke Settings
-                context.go('/settings');
-              },
-            ),
-          ],
-        ),
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+    _currentDateTime = DateTime.now();
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+      if (mounted) {
+        setState(() => _currentDateTime = DateTime.now());
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   // Widget Navigasi Tanggal & Waktu, dan Tombol Parameter
@@ -111,7 +104,6 @@ class AnalysisPage extends StatelessWidget {
           // Tombol Set Parameters
           ElevatedButton(
             onPressed: () {
-              // Aksi: Buka modal atau halaman untuk mengatur parameter
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Set Parameters clicked')),
               );
@@ -146,11 +138,9 @@ class AnalysisPage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Area Chart (Simulasi)
             Expanded(
               child: Center(
                 child: Container(
-                  // Area yang seharusnya diisi oleh Fl_chart atau chart library lainnya
                   decoration: BoxDecoration(
                     border: Border(
                       left: BorderSide(color: Colors.grey.shade300),
@@ -197,46 +187,46 @@ class AnalysisPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dateFormat = DateFormat('d MMMM yyyy');
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Kustom
-          _buildCustomAppBar(context),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Judul
-                const Padding(
-                  padding: EdgeInsets.only(top: 8, bottom: 8.0),
-                  child: Text(
-                    'Energy Chart',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: primaryTextColor,
-                    ),
-                  ),
-                ),
+      // IMPLEMENTASI CUSTOM APP BAR
+      appBar: CustomAppBar(
+        title: dateFormat.format(_currentDateTime),
+        trailing: IconButton(
+          icon: SvgPicture.asset('assets/svg/settings.svg'),
+          onPressed: () {
+            context.go('/settings');
+          },
+        ),
+        showBackButton: false,
+        // showBackButton defaultnya true
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
 
-                // Navigasi & Tombol Parameter
-                _buildNavigatorAndParameters(context),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
 
-                const SizedBox(height: 16),
+              // Navigasi & Tombol Parameter (Diletakkan di body agar bisa di-scroll)
+              _buildNavigatorAndParameters(context),
 
-                // Area Grafik
-                _buildChartPlaceholder(),
-              ],
-            ),
+              const SizedBox(height: 16),
+
+              // Area Grafik
+              _buildChartPlaceholder(),
+
+              const SizedBox(height: 50),
+            ],
           ),
-
-          // Sisanya diisi dengan Padding kosong jika tidak ada konten lain
-          const Spacer(),
-        ],
+        ),
       ),
     );
   }

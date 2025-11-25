@@ -1,6 +1,9 @@
+import 'package:aerion_dashboard/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:aerion_dashboard/themes/app_colors.dart';
 
 // Asumsi: Path ke AuthNotifier dan AppRoutes sudah benar
 import '../../../auth/presentation/providers/auth_notifier.dart';
@@ -9,7 +12,6 @@ import '../../../../routes/app_routes.dart';
 
 // --- ASUMSI: DEFINISI SVG ICON HELPER (diambil dari AppRouter/MainScaffold) ---
 // Ini harus dipindahkan ke file utilitas di proyek Anda agar dapat diakses
-import 'package:flutter_svg/flutter_svg.dart';
 
 class SvgBottomBarIcon extends StatelessWidget {
   final String assetPath;
@@ -27,7 +29,7 @@ class SvgBottomBarIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return SvgPicture.asset(
       assetPath,
-      // colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
       width: size,
       height: size,
       placeholderBuilder: (BuildContext context) =>
@@ -76,11 +78,7 @@ class ProfilePage extends StatelessWidget {
         ),
 
         // MENGGANTI ICON DENGAN SVG ICON BUILDER
-        leading: SvgBottomBarIcon(
-          assetPath: assetPath,
-          color: iconColor,
-          size: 24,
-        ),
+        leading: SvgPicture.asset(assetPath),
 
         title: Text(
           title,
@@ -109,20 +107,11 @@ class ProfilePage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text(
-          'Setting',
-          style: TextStyle(
-            color: primaryTextColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      appBar: CustomAppBar(
+        title: 'Setting',
+        showBackButton: true,
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: primaryTextColor),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 24.0),
@@ -140,13 +129,17 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const CircleAvatar(
+                      CircleAvatar(
                         radius: 30,
-                        backgroundColor: accentColor,
-                        child: Icon(
-                          Icons.person,
-                          color: Colors.white,
-                          size: 36,
+                        backgroundColor: AppColors.accent,
+                        child: SvgPicture.asset(
+                          'assets/svg/user.svg',
+                          colorFilter: ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
+                          width: 30,
+                          height: 30,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -176,7 +169,7 @@ class ProfilePage extends StatelessWidget {
                   TextButton(
                     onPressed: () {
                       // MENGGUNAKAN RUTE FULL-SCREEN
-                      context.go('/${AppRoutes.sites}');
+                      context.go('${AppRoutes.settings}/change-profile');
                     },
                     child: const Text(
                       'Edit Data',
@@ -246,7 +239,7 @@ class ProfilePage extends StatelessWidget {
                     context: context,
                     assetPath: 'assets/svg/about.svg',
                     title: 'About Us',
-                    route: AppRoutes.sites, // Asumsi: Rute di luar Shell
+                    route: AppRoutes.aboutUs,
                   ),
                   const Divider(
                     height: 0,
@@ -260,7 +253,7 @@ class ProfilePage extends StatelessWidget {
                     context: context,
                     assetPath: 'assets/svg/help.svg',
                     title: 'Help',
-                    route: AppRoutes.sites,
+                    route: AppRoutes.help,
                   ),
                 ],
               ),

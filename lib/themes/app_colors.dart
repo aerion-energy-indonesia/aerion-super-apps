@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 class AppColors {
   // 1. Primary Colors (Warna Utama Aplikasi)
   static const Color primary = Color(0xFF1976D2); // Biru Gelap
-  static const Color secondary = Color(0xFFFFC107); // Kuning Amber
-  static const Color accent = Color(0xFF00BCD4); // Cyan
+  static const Color secondary = Color.fromRGBO(255, 193, 7, 1); // Kuning Amber
+  static const Color accent = Color(0xFF00305E); // Abu-Biru Tua
 
   // 2. Background & Surface Colors
   static const Color backgroundLight = Color(0xFFFFFFFF); // Putih
@@ -17,8 +17,11 @@ class AppColors {
   static const Color textPrimary = Color(0xFF212121); // Hitam
   static const Color textSecondary = Color(0xFF3F3F47); // Abu-abu
   static const Color textOnPrimary = Color(
-    0xFFFFFFFF,
+    0xFF364153,
   ); // Putih (untuk di atas warna primary)
+  static const Color textOnSecondary = Color(
+    0xFF6A7282,
+  ); // Hitam (untuk di atas warna secondary)
 
   // 4. State Colors (Warna Status)
   static const Color error = Color(0xFFD32F2F); // Merah

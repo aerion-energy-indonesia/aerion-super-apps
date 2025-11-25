@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-
-// Asumsi: Anda memiliki AuthNotifier dan AuthState di path berikut
+import 'package:go_router/go_router.dart';
+import 'package:aerion_dashboard/widgets/app_bar.dart';
 import 'package:aerion_dashboard/features/auth/presentation/providers/auth_notifier.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -153,20 +154,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text(
-          'Personal Profile',
-          style: TextStyle(
-            color: primaryTextColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      appBar: CustomAppBar(
+        title: 'Personal Profile',
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: primaryTextColor),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        showBackButton: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -181,10 +173,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
               Center(
                 child: Column(
                   children: [
-                    const CircleAvatar(
+                    CircleAvatar(
                       radius: 50,
                       backgroundColor: buttonColor,
-                      child: Icon(Icons.person, color: Colors.white, size: 60),
+                      child: SvgPicture.asset(
+                        'assets/svg/user.svg',
+                        colorFilter: ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
+                        width: 50,
+                        height: 50,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     InkWell(

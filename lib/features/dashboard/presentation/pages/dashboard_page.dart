@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:go_router/go_router.dart';
+import 'package:aerion_dashboard/widgets/app_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-// Asumsikan path widgets ini benar. Saya akan membuat implementasi mock/placeholder di bawah.
-// import '../widgets/summary_card.dart';
-// import '../widgets/recent_activity.dart';
+import 'package:intl/intl.dart';
 
 // Model dasar untuk data yang ditampilkan di halaman
 class DashboardData {
@@ -73,14 +73,32 @@ class KeyValueItem extends StatelessWidget {
 // WIDGET UTAMA
 // =========================================================================
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
 
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
   static const Color primaryTextColor = Color(0xFF364153);
   static const Color accentGreen = Color(0xFF10B981);
   static const Color accentRed = Color(0xFFE41E26);
   static const Color komatsuBlue = Color(0xFF00305E);
   static const Color secondaryTextColor = Colors.grey;
+  late DateTime _currentDateTime;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentDateTime = DateTime.now();
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+      if (mounted) {
+        setState(() => _currentDateTime = DateTime.now());
+      }
+    });
+  }
 
   // Data mock halaman
   DashboardData _getMockData() {
@@ -92,34 +110,13 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  // Widget Header Tanggal & Pengaturan (Seperti di halaman Analysis)
-  Widget _buildCustomAppBar(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 8),
-        color: Colors.white,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              '24 November 2025', // Tanggal Saat Ini
-              style: TextStyle(
-                color: primaryTextColor,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            IconButton(
-              icon: SvgPicture.asset('assets/svg/settings.svg'),
-              onPressed: () {
-                context.go('/settings');
-              },
-            ),
-          ],
-        ),
-      ),
-    );
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
+
+  // HAPUS _buildCustomAppBar kustom dari sini karena akan digantikan oleh widget CustomAppBar
 
   // Bagian Header Situs & Diagram
   Widget _buildSiteHeaderAndDiagram(BuildContext context, DashboardData data) {
@@ -628,18 +625,29 @@ class DashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final data = _getMockData();
-
+    final timeFormat = DateFormat('hh:mm:ss a');
+    final dateFormat = DateFormat('d MMMM yyyy');
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      // Body tidak menggunakan SingleChildScrollView karena ShellWrapper akan menyediakannya
-      // Tapi karena kita ingin CustomAppBar, kita gunakan CustomScrollView
+      backgroundColor: Colors.white,
+      appBar: CustomAppBar(
+        title: dateFormat.format(_currentDateTime),
+        subtitle: timeFormat.format(_currentDateTime),
+        showBackButton: false, // Dashboard tidak punya tombol back
+        trailing: IconButton(
+          icon: SvgPicture.asset('assets/svg/settings.svg'),
+          onPressed: () {
+            // Navigasi ke Settings
+            context.go('/settings');
+          },
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
+
       body: CustomScrollView(
         slivers: [
           SliverList(
             delegate: SliverChildListDelegate([
-              // 1. Custom AppBar (Hanya bagian Tanggal/Setting)
-              _buildCustomAppBar(context),
-
               // 2. Header Situs dan Diagram
               _buildSiteHeaderAndDiagram(context, data),
 

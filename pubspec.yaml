@@ -50,6 +50,7 @@ dependencies:
   flutter_launcher_icons: ^0.14.4
   font_awesome_flutter: ^10.12.0
   flutter_svg: ^2.2.2
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
@@ -141,14 +142,16 @@ flutter:
         - assets/svg/activity.svg
         - assets/svg/file.svg
         - assets/svg/settings.svg
-        - assets/svg/profile.svg
+        - assets/svg/user.svg
         - assets/svg/password.svg
         - assets/svg/maps.svg
         - assets/svg/about.svg
         - assets/svg/help.svg
         - assets/svg/language.svg
         - assets/svg/logout.svg
-        - assets/svg/language.svg
+        - assets/svg/chevron-left.svg
+        - assets/svg/eye-open.svg
+        - assets/svg/eye-close.svg
 
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:aerion_dashboard/widgets/app_bar.dart';
 
 class AboutUsPage extends StatelessWidget {
   const AboutUsPage({super.key});
@@ -7,20 +8,11 @@ class AboutUsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white, // Sesuaikan dengan background di desain
-      appBar: AppBar(
-        title: const Text(
-          'About Us',
-          style: TextStyle(
-            color: Color(0xFF364153), // Warna teks utama
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      appBar: CustomAppBar(
+        title: 'About Us',
         backgroundColor: Colors.white,
-        elevation: 0, // Hapus shadow di AppBar
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF364153)),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        elevation: 0,
+        showBackButton: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -119,8 +111,8 @@ class AboutUsPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Padding(
-            padding: EdgeInsets.only(top: 4.0, right: 8.0),
-            child: Icon(Icons.circle, size: 6, color: Color(0xFF364153)),
+            padding: EdgeInsets.only(top: 8.0, right: 8.0),
+            child: Icon(Icons.circle, size: 5, color: Color(0xFF364153)),
           ),
           Expanded(
             child: Text(

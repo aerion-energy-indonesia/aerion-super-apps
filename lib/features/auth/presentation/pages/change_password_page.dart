@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-
-// Asumsi: Anda memiliki AuthNotifier dan AuthState di path berikut
 import 'package:aerion_dashboard/features/auth/presentation/providers/auth_notifier.dart';
-// Asumsi: Anda memiliki komponenFormField.dart atau form_field.dart
-// import '../widgets/form_field.dart';
+import 'package:aerion_dashboard/widgets/app_bar.dart';
+import 'package:aerion_dashboard/themes/app_colors.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
@@ -121,9 +120,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               borderSide: BorderSide(color: accentColor, width: 1.5),
             ),
             suffixIcon: IconButton(
-              icon: Icon(
-                isVisible ? Icons.visibility : Icons.visibility_off,
-                color: Colors.grey,
+              icon: SvgPicture.asset(
+                isVisible
+                    ? 'assets/svg/eye-open.svg'
+                    : 'assets/svg/eye-close.svg',
               ),
               onPressed: toggleVisibility,
             ),
@@ -145,20 +145,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text(
-          'Change Password',
-          style: TextStyle(
-            color: primaryTextColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      appBar: CustomAppBar(
+        title: 'Change Password',
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: primaryTextColor),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        showBackButton: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -186,10 +177,18 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 ),
                 child: Row(
                   children: [
-                    const CircleAvatar(
+                    CircleAvatar(
                       radius: 24,
-                      backgroundColor: Colors.grey,
-                      child: Icon(Icons.person, color: Colors.white, size: 30),
+                      backgroundColor: AppColors.accent,
+                      child: SvgPicture.asset(
+                        'assets/svg/user.svg',
+                        colorFilter: ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
+                        width: 24,
+                        height: 24,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Column(

@@ -1,3 +1,5 @@
+import 'package:aerion_dashboard/features/profile/presentation/pages/about_us_page.dart';
+import 'package:aerion_dashboard/features/profile/presentation/pages/help_page.dart';
 import 'package:aerion_dashboard/features/profile/presentation/pages/language_setting_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +9,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:aerion_dashboard/features/auth/presentation/pages/login_page.dart';
 import 'package:aerion_dashboard/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:aerion_dashboard/features/auth/presentation/pages/forgot_password_page.dart';
+import 'package:aerion_dashboard/features/profile/presentation/pages/change_profile_page.dart';
 // Note: Perlu mengimpor ClusterPage. Saya asumsikan path-nya sama dengan Dashboard/Sites
 // import 'package:aerion_dashboard/features/cluster/presentation/pages/cluster_page.dart';
 import 'package:aerion_dashboard/features/dashboard/presentation/pages/dashboard_page.dart';
@@ -257,7 +260,7 @@ class AppRouter {
           ),
           GoRoute(
             path: AppRoutes.data,
-            builder: (context, state) => const DataPage(),
+            builder: (context, state) => const DataDetailsPage(),
           ),
 
           // ** TAB 2: SITES **
@@ -307,17 +310,44 @@ class AppRouter {
         // Entry point untuk Settings
         builder: (context, state) => const ProfilePage(),
         routes: [
+          // Change Profile Page
+          GoRoute(
+            // Navigasi di root navigator (Full screen)
+            parentNavigatorKey: _rootNavigatorKey,
+            path: AppRoutes.changeProfile,
+            builder: (context, state) => const EditProfilePage(),
+          ),
+          // Change Password Page
           GoRoute(
             // Navigasi di root navigator (Full screen)
             parentNavigatorKey: _rootNavigatorKey,
             path: AppRoutes.changePassword,
             builder: (context, state) => const ChangePasswordPage(),
           ),
+          // Change Password Page
+          GoRoute(
+            parentNavigatorKey: _rootNavigatorKey,
+            path: AppRoutes.changePassword,
+            builder: (context, state) => const ChangePasswordPage(),
+          ),
+          // Language Settings Page
           GoRoute(
             parentNavigatorKey: _rootNavigatorKey,
             path: AppRoutes.languageSettings,
             builder: (context, state) => const LanguageSettingPage(),
           ),
+          // About Us Page
+          GoRoute(
+            parentNavigatorKey: _rootNavigatorKey,
+            path: AppRoutes.aboutUs,
+            builder: (context, state) => const AboutUsPage(),
+          ),
+          // Help Page
+          GoRoute(
+            parentNavigatorKey: _rootNavigatorKey,
+            path: AppRoutes.help,
+            builder: (context, state) => const HelpPage(),
+          ), // Ganti  dengan HelpPage
         ],
       ),
     ],

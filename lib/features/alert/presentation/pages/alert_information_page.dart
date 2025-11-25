@@ -1,6 +1,10 @@
+import 'dart:async';
 import 'package:aerion_dashboard/themes/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:aerion_dashboard/widgets/app_bar.dart';
 import 'package:aerion_dashboard/features/onboarding/domain/entities/onboarding_item.dart';
 
 // =========================================================================
@@ -72,6 +76,8 @@ class AlertInformationPage extends StatefulWidget {
 }
 
 class _AlertInformationPage extends State<AlertInformationPage> {
+  late DateTime _currentDateTime;
+  Timer? _timer;
   final TextEditingController _searchController = TextEditingController();
   List<AlertEntity> _allSitess = [];
   List<AlertEntity> _filteredSitess = [];
@@ -79,6 +85,12 @@ class _AlertInformationPage extends State<AlertInformationPage> {
   @override
   void initState() {
     super.initState();
+    _currentDateTime = DateTime.now();
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+      if (mounted) {
+        setState(() => _currentDateTime = DateTime.now());
+      }
+    });
     _allSitess = _mockSitess();
     _filteredSitess = _allSitess;
 
@@ -87,6 +99,7 @@ class _AlertInformationPage extends State<AlertInformationPage> {
 
   @override
   void dispose() {
+    _timer?.cancel();
     _searchController.removeListener(_applySearchFilter);
     _searchController.dispose();
     super.dispose();
@@ -138,9 +151,22 @@ class _AlertInformationPage extends State<AlertInformationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final dateFormat = DateFormat('d MMMM yyyy');
+
     return Scaffold(
       backgroundColor: Colors.grey[100], // Background terang
-      // Hapus AppBar default, kita buat kustom di Body
+      appBar: CustomAppBar(
+        title: dateFormat.format(_currentDateTime),
+        showBackButton: false,
+        trailing: IconButton(
+          icon: SvgPicture.asset('assets/svg/settings.svg'),
+          onPressed: () {
+            context.go('/settings');
+          },
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
       body: _buildBody(),
     );
   }
@@ -157,32 +183,17 @@ class _AlertInformationPage extends State<AlertInformationPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // 1. Header Kustom (Menggantikan AppBar)
+        // 1. Header Konten (di bawah AppBar)
         Container(
           padding: const EdgeInsets.only(
-            top: 48,
+            top: 16,
             left: 16,
             right: 16,
             bottom: 16,
           ),
           color: Colors.white, // Background putih untuk header
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Judul Halaman
-              const Text(
-                'Alert Information',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF364153),
-                  fontFamily: 'GeistSemiBold', // Warna teks utama
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Divider(height: 1, thickness: 0.5, color: Colors.grey),
-              const SizedBox(height: 16),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [

@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:aerion_dashboard/widgets/app_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 // Model untuk Data Waktu (Kolom Kiri)
@@ -19,21 +22,21 @@ class DataDetail {
   DataDetail({required this.name, required this.value, required this.unit});
 }
 
-class DataPage extends StatefulWidget {
-  const DataPage({super.key});
+class DataDetailsPage extends StatefulWidget {
+  const DataDetailsPage({super.key});
 
   @override
-  State<DataPage> createState() => _DataPageState();
+  State<DataDetailsPage> createState() => _DataDetailsPageState();
 }
 
-class _DataPageState extends State<DataPage> {
+class _DataDetailsPageState extends State<DataDetailsPage> {
   // Warna dan Konstanta
   static const Color primaryTextColor = Color(0xFF364153);
-  static const Color accentBlue = Color(0xFF3B82F6);
   static const Color accentRed = Color(0xFFEF4444);
-  static const Color selectedTimeColor = Color(
-    0xFFF0F4F8,
-  ); // Warna latar belakang item waktu yang dipilih
+  static const Color selectedTimeColor = Color(0xFFF0F4F8);
+
+  late DateTime _currentDateTime;
+  Timer? _timer;
 
   // Data Mock
   late List<TimeLog> _timeLogs;
@@ -43,11 +46,15 @@ class _DataPageState extends State<DataPage> {
   @override
   void initState() {
     super.initState();
+    _currentDateTime = DateTime.now();
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+      if (mounted) {
+        setState(() => _currentDateTime = DateTime.now());
+      }
+    });
     _timeLogs = _mockTimeLogs();
     _currentDetails = _getDetails(_selectedDetailId);
   }
-
-  // --- Mock Data ---
 
   List<TimeLog> _mockTimeLogs() {
     return [
@@ -68,7 +75,6 @@ class _DataPageState extends State<DataPage> {
   }
 
   List<DataDetail> _getDetails(String detailId) {
-    // Data mock yang kompleks (simulasi data yang berbeda berdasarkan waktu/detailId)
     if (detailId == 'log_1') {
       return [
         DataDetail(name: 'Working State', value: 'Invert', unit: 'Mode'),
@@ -85,49 +91,12 @@ class _DataPageState extends State<DataPage> {
         DataDetail(name: 'Apparent Power', value: '4486', unit: 'VA'),
       ];
     }
-    // Jika waktu berbeda, data harus berbeda. Ini hanya simulasi.
     return [
       DataDetail(name: 'Working State', value: 'Standby', unit: 'Mode'),
       DataDetail(name: 'AC Input Voltage', value: '0', unit: 'V'),
       DataDetail(name: 'PV Input Voltage', value: '350.5', unit: 'V'),
       DataDetail(name: 'Battery Capacity', value: '85', unit: '%'),
     ];
-  }
-
-  // --- UI Builder ---
-
-  // Widget Header Tanggal & Pengaturan
-  Widget _buildCustomAppBar(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 8),
-        color: Colors.white,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              '24 November 2025',
-              style: TextStyle(
-                color: primaryTextColor,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            IconButton(
-              icon: SvgPicture.asset(
-                'assets/svg/settings.svg',
-                width: 24,
-                height: 24,
-              ),
-              onPressed: () {
-                // Aksi: Navigasi ke Settings
-                context.go('/settings');
-              },
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   // Widget Dropdown Tanggal & Waktu Navigasi
@@ -188,7 +157,6 @@ class _DataPageState extends State<DataPage> {
     return SizedBox(
       width: 100, // Lebar tetap untuk kolom waktu
       child: ListView.builder(
-        // Catatan: Jika ingin scroll bersama, gunakan controller
         itemCount: _timeLogs.length,
         itemBuilder: (context, index) {
           final log = _timeLogs[index];
@@ -206,7 +174,6 @@ class _DataPageState extends State<DataPage> {
               padding: const EdgeInsets.symmetric(vertical: 12.0),
               decoration: BoxDecoration(
                 color: isSelected ? selectedTimeColor : Colors.white,
-                // Border kanan tebal untuk penanda aktif
                 border: Border(
                   right: BorderSide(
                     color: isSelected ? accentRed : Colors.transparent,
@@ -215,7 +182,7 @@ class _DataPageState extends State<DataPage> {
                 ),
               ),
               child: Text(
-                log.time.split(' ')[0], // Hanya tampilkan waktu (misal 13:06)
+                log.time.split(' ')[0],
                 style: TextStyle(
                   color: isSelected ? accentRed : primaryTextColor,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -234,9 +201,7 @@ class _DataPageState extends State<DataPage> {
     return Expanded(
       child: Container(
         color: Colors.white,
-        padding: const EdgeInsets.only(
-          left: 16.0,
-        ), // Padding kiri untuk memisahkan
+        padding: const EdgeInsets.only(left: 16.0),
         child: Column(
           children: [
             // Header Kolom Kanan
@@ -314,34 +279,38 @@ class _DataPageState extends State<DataPage> {
 
   @override
   Widget build(BuildContext context) {
+    // final timeFormat = DateFormat('hh:mm:ss a');
+    final dateFormat = DateFormat('d MMMM yyyy');
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
+
+      // IMPLEMENTASI CUSTOM APP BAR
+      appBar: CustomAppBar(
+        title: dateFormat.format(_currentDateTime),
+        // subtitle: timeFormat.format(_currentDateTime),
+        showBackButton: false,
+        trailing: IconButton(
+          icon: SvgPicture.asset('assets/svg/settings.svg'),
+          onPressed: () {
+            context.go('/settings');
+          },
+        ),
+
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
+
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Kustom
-          _buildCustomAppBar(context),
-
-          // Judul Data Details
-          const Padding(
-            padding: EdgeInsets.only(top: 8, left: 16.0, bottom: 8.0),
-            child: Text(
-              'Data Details',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: primaryTextColor,
-              ),
-            ),
-          ),
-
-          // Navigasi Tanggal & Waktu
+          // Navigasi Tanggal & Waktu (Diletakkan di body agar bisa di-scroll/disesuaikan)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: _buildDateNavigator(),
           ),
 
-          // Area Tabel Utama (Flex untuk sisa ruang)
+          // Area Tabel Utama
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),

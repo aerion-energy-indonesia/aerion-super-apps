@@ -25,8 +25,11 @@ class AppRoutes {
   static const String settings = '/settings';
 
   // Sub-routes di bawah /settings (untuk navigasi bersarang)
+  static const String aboutUs = 'about-us';
   static const String changePassword = 'change-password';
+  static const String changeProfile = 'change-profile';
   static const String languageSettings = 'language-settings';
+  static const String help = 'help';
 
   // Contoh rute detail/aksi
   static const String editDeviceName =

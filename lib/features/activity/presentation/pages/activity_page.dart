@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:aerion_dashboard/widgets/app_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 // Model untuk data rinci log
 class EnergyLog {
@@ -15,8 +18,16 @@ class EnergyLog {
   });
 }
 
-class ActivityPage extends StatelessWidget {
+class ActivityPage extends StatefulWidget {
   const ActivityPage({super.key});
+
+  @override
+  State<ActivityPage> createState() => _ActivityPageState();
+}
+
+class _ActivityPageState extends State<ActivityPage> {
+  late DateTime _currentDateTime;
+  Timer? _timer;
 
   // Warna dan Konstanta
   static const Color primaryTextColor = Color(0xFF364153);
@@ -24,6 +35,23 @@ class ActivityPage extends StatelessWidget {
     0xFF3B82F6,
   ); // Warna biru untuk generation
   static const Color accentRed = Color(0xFFEF4444); // Warna merah untuk usage
+
+  @override
+  void initState() {
+    super.initState();
+    _currentDateTime = DateTime.now();
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+      if (mounted) {
+        setState(() => _currentDateTime = DateTime.now());
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   // Data Mock untuk List Log
   List<EnergyLog> _mockLogData() {
@@ -93,7 +121,6 @@ class ActivityPage extends StatelessWidget {
 
   // Widget Placeholder untuk Grafik Garis (Area yang kompleks)
   Widget _buildChartPlaceholder(BuildContext context) {
-    // Kita simulasi area chart dengan Container
     return Container(
       height: 200,
       margin: const EdgeInsets.only(top: 16, bottom: 8),
@@ -116,111 +143,85 @@ class ActivityPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final logData = _mockLogData();
+    final dateFormat = DateFormat('d MMMM yyyy');
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      body: CustomScrollView(
-        slivers: [
-          // AppBar Kustom
-          SliverAppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            floating: true,
-            pinned: true,
-            automaticallyImplyLeading:
-                false, // Menghilangkan tombol back default
-            title: const Text(
-              '24 November 2025', // Tanggal Saat Ini
-              style: TextStyle(
-                color: primaryTextColor,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+
+      // IMPLEMENTASI CUSTOM APP BAR
+      appBar: CustomAppBar(
+        title: dateFormat.format(
+          _currentDateTime,
+        ), // Menggunakan tanggal sebagai judul
+        showBackButton: false,
+        trailing: IconButton(
+          icon: SvgPicture.asset('assets/svg/settings.svg'),
+          onPressed: () {
+            context.go('/settings');
+          },
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
+
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Energy Chart',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: primaryTextColor,
+                ),
               ),
-            ),
-            actions: [
-              IconButton(
-                icon: SvgPicture.asset('assets/svg/settings.svg'),
-                onPressed: () {
-                  // Aksi: Navigasi ke Settings
-                  context.go('/settings');
-                },
+              const SizedBox(height: 8),
+
+              Text(
+                'Total Power 5,818.61 kWh',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  color: primaryTextColor,
+                ),
               ),
+              const SizedBox(height: 16),
+
+              _buildTimeTabs(),
+
+              _buildChartPlaceholder(context),
+
+              _buildChartLegend(),
+
+              const SizedBox(height: 16),
+
+              _buildSummaryCards(),
+
+              const SizedBox(height: 24),
+
+              const Text(
+                'Activity Log Details',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: primaryTextColor,
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              _buildLogTable(logData),
+              const SizedBox(height: 50),
             ],
           ),
-
-          SliverList(
-            delegate: SliverChildListDelegate([
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Energy Chart',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: primaryTextColor,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Ringkasan Total Daya
-                    Text(
-                      'Total Power 5,818.61 kWh',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: primaryTextColor,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Tab Bar untuk Hari/Bulan/Tahun
-                    _buildTimeTabs(),
-
-                    // Kontainer Chart (Placeholder)
-                    _buildChartPlaceholder(context),
-
-                    // Legend Grafik
-                    _buildChartLegend(),
-
-                    const SizedBox(height: 16),
-
-                    // Summary Cards (Power Generation & Load Usage)
-                    _buildSummaryCards(),
-
-                    const SizedBox(height: 24),
-
-                    // Detail Data Log
-                    const Text(
-                      'Activity Log Details',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: primaryTextColor,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Tabel/List Data Log
-                    _buildLogTable(logData),
-                  ],
-                ),
-              ),
-            ]),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  // Widget Tab Hari/Bulan/Tahun
   Widget _buildTimeTabs() {
-    // Kita simulasi tampilan tab yang solid
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
@@ -231,7 +232,6 @@ class ActivityPage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: ['Day', 'Month', 'Year'].map((label) {
-          // Simulasi tab 'Day' aktif
           bool isActive = label == 'Day';
           return Expanded(
             child: Padding(
@@ -261,7 +261,6 @@ class ActivityPage extends StatelessWidget {
     );
   }
 
-  // Widget Legend Grafik
   Widget _buildChartLegend() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -276,7 +275,6 @@ class ActivityPage extends StatelessWidget {
     );
   }
 
-  // Widget Pembantu untuk Legend
   Widget _buildLegendItem({required String label, required Color color}) {
     return Row(
       children: [
@@ -291,7 +289,6 @@ class ActivityPage extends StatelessWidget {
     );
   }
 
-  // Widget Summary Cards
   Widget _buildSummaryCards() {
     return Row(
       children: [
@@ -370,7 +367,6 @@ class ActivityPage extends StatelessWidget {
     );
   }
 
-  // Widget Log Table (Menggunakan DataTable atau ListView, saya pilih ListView/Column untuk responsif)
   Widget _buildLogTable(List<EnergyLog> logs) {
     return Container(
       padding: const EdgeInsets.all(8.0),
@@ -435,7 +431,7 @@ class ActivityPage extends StatelessWidget {
                 ],
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );

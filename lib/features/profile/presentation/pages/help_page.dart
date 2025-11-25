@@ -1,3 +1,4 @@
+import 'package:aerion_dashboard/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 
 // Asumsi rute navigasi lain sudah terdefinisi di GoRouter
@@ -15,20 +16,11 @@ class HelpPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.grey[100], // Background lebih terang
-      appBar: AppBar(
-        title: const Text(
-          'Help',
-          style: TextStyle(
-            color: primaryTextColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      appBar: CustomAppBar(
+        title: 'Help',
         backgroundColor: cardColor,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: primaryTextColor),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        showBackButton: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
@@ -58,6 +50,7 @@ class HelpPage extends StatelessWidget {
                   fontSize: 14,
                   height: 1.5,
                   color: primaryTextColor,
+                  fontFamily: 'GeistRegular',
                 ),
               ),
             ),
@@ -134,6 +127,7 @@ class HelpPage extends StatelessWidget {
                   fontSize: 14,
                   height: 1.5,
                   color: primaryTextColor,
+                  fontFamily: 'GeistRegular',
                 ),
               ),
             ),
@@ -153,9 +147,10 @@ class HelpPage extends StatelessWidget {
       title: Text(
         title,
         style: const TextStyle(
-          fontSize: 16,
+          fontSize: 14,
           color: Color(0xFF364153),
           fontWeight: FontWeight.w500,
+          fontFamily: 'GeistRegular',
         ),
       ),
       trailing: const Icon(
