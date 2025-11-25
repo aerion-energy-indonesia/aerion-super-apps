@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:go_router/go_router.dart';
 import 'package:aerion_dashboard/widgets/app_bar.dart';
+import 'package:video_player/video_player.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
@@ -81,6 +82,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  late VideoPlayerController _videoController;
   static const Color primaryTextColor = Color(0xFF364153);
   static const Color accentGreen = Color(0xFF10B981);
   static const Color accentRed = Color(0xFFE41E26);
@@ -98,6 +100,16 @@ class _DashboardPageState extends State<DashboardPage> {
         setState(() => _currentDateTime = DateTime.now());
       }
     });
+
+    _videoController =
+        VideoPlayerController.asset('assets/videos/super-apps.mp4')
+          ..initialize().then((_) {
+            // Pastikan video mulai diputar dan loop
+            _videoController.play();
+            _videoController.setLooping(true);
+            // Refresh UI setelah inisialisasi selesai
+            setState(() {});
+          });
   }
 
   // Data mock halaman
@@ -113,6 +125,7 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void dispose() {
     _timer?.cancel();
+    _videoController.dispose();
     super.dispose();
   }
 
@@ -122,10 +135,25 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildSiteHeaderAndDiagram(BuildContext context, DashboardData data) {
     return Container(
       color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Placeholder Diagram Sistem (Image/Simulasi)
+          SizedBox(
+            height: 400,
+            width: double.infinity,
+            child: Center(
+              child: _videoController.value.isInitialized
+                  ? AspectRatio(
+                      aspectRatio: _videoController.value.aspectRatio,
+                      child: VideoPlayer(_videoController),
+                    )
+                  : const CircularProgressIndicator(
+                      color: Colors.white,
+                    ), // Loading indicator
+            ),
+          ),
+
           // Info Perusahaan
           Row(
             children: [
@@ -172,22 +200,6 @@ class _DashboardPageState extends State<DashboardPage> {
             style: TextStyle(fontSize: 13, color: secondaryTextColor),
           ),
           const SizedBox(height: 16),
-
-          // Placeholder Diagram Sistem (Image/Simulasi)
-          Container(
-            height: 180,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            child: Center(
-              child: Text(
-                'Simulasi Diagram Sistem Hybrid Energi',
-                style: TextStyle(color: secondaryTextColor),
-              ),
-            ),
-          ),
         ],
       ),
     );
