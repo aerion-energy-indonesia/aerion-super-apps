@@ -1,9 +1,14 @@
+import 'package:aerion_dashboard/features/dashboard/presentation/widgets/text_info.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:go_router/go_router.dart';
 import 'package:aerion_dashboard/widgets/app_bar.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:aerion_dashboard/widgets/bottom_sheet.dart';
+import 'package:aerion_dashboard/themes/app_colors.dart';
+import 'package:aerion_dashboard/widgets/reusable_pie_chart.dart';
+import 'package:aerion_dashboard/widgets/reusable_bar_chart.dart';
 import 'package:intl/intl.dart';
 
 // Model dasar untuk data yang ditampilkan di halaman
@@ -11,7 +16,6 @@ class DashboardData {
   final String clusterName;
   final String siteName;
   final String siteAddress;
-
   DashboardData({
     required this.clusterName,
     required this.siteName,
@@ -20,14 +24,17 @@ class DashboardData {
 }
 
 // =========================================================================
+
 // WIDGET PLACEHOLDER/HELPER (Harus dipindahkan ke file terpisah di aplikasi nyata)
+
 // =========================================================================
 
 // Widget kecil untuk menampilkan Key-Value Pair (seperti PV Output)
+
 class KeyValueItem extends StatelessWidget {
   final String label;
   final String value;
-  final IconData icon;
+  final String icon; // Path asset SVG
   final Color valueColor;
 
   const KeyValueItem({
@@ -35,34 +42,74 @@ class KeyValueItem extends StatelessWidget {
     required this.label,
     required this.value,
     required this.icon,
-    this.valueColor = const Color(0xFF10B981), // Default Green
+    this.valueColor = AppColors
+        .textPrimary, // valueColor seharusnya tidak memiliki nilai default di sini jika AppColors tidak diimpor
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+    // Menghilangkan Expanded di tingkat tertinggi
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Column(
+        // Column di tingkat ini sudah cukup
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // 1. Icon dan Label (Menyatukan Icon dan Label dalam satu Row untuk layout yang lebih baik)
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(icon, size: 16, color: valueColor),
-              const SizedBox(width: 4),
-              Text(
-                label,
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              // Icon SVG
+              SvgPicture.asset(icon, height: 20, width: 20),
+              const SizedBox(
+                width: 8,
+              ), // Jarak horizontal antara icon dan label
+              // Label
+              // Menggunakan Flexible daripada Expanded penuh di sini untuk memberi ruang pada SvgPicture
+              Flexible(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                    fontFamily: 'GeistRegular',
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: valueColor,
-            ),
+
+          const SizedBox(
+            height: 4,
+          ), // Jarak vertikal antara Label/Icon dan Nilai
+          // 2. Value (Nilai)
+          Row(
+            crossAxisAlignment:
+                CrossAxisAlignment.end, // Menyelaraskan teks 'kW' dengan nilai
+            children: [
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: valueColor,
+                  fontFamily: 'GeistRegular',
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+              // Tambahan unit 'kW'
+              Text(
+                ' kW',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                  fontFamily: 'GeistRegular',
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -73,10 +120,8 @@ class KeyValueItem extends StatelessWidget {
 // =========================================================================
 // WIDGET UTAMA
 // =========================================================================
-
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
-
   @override
   State<DashboardPage> createState() => _DashboardPageState();
 }
@@ -85,12 +130,10 @@ class _DashboardPageState extends State<DashboardPage> {
   late VideoPlayerController _videoController;
   static const Color primaryTextColor = Color(0xFF364153);
   static const Color accentGreen = Color(0xFF10B981);
-  static const Color accentRed = Color(0xFFE41E26);
   static const Color komatsuBlue = Color(0xFF00305E);
   static const Color secondaryTextColor = Colors.grey;
   late DateTime _currentDateTime;
   Timer? _timer;
-
   @override
   void initState() {
     super.initState();
@@ -100,7 +143,6 @@ class _DashboardPageState extends State<DashboardPage> {
         setState(() => _currentDateTime = DateTime.now());
       }
     });
-
     _videoController =
         VideoPlayerController.asset('assets/videos/super-apps.mp4')
           ..initialize().then((_) {
@@ -129,8 +171,6 @@ class _DashboardPageState extends State<DashboardPage> {
     super.dispose();
   }
 
-  // HAPUS _buildCustomAppBar kustom dari sini karena akan digantikan oleh widget CustomAppBar
-
   // Bagian Header Situs & Diagram
   Widget _buildSiteHeaderAndDiagram(BuildContext context, DashboardData data) {
     return Container(
@@ -140,8 +180,8 @@ class _DashboardPageState extends State<DashboardPage> {
         children: [
           // Placeholder Diagram Sistem (Image/Simulasi)
           SizedBox(
-            height: 400,
-            width: double.infinity,
+            // height: 400,
+            // width: double.infinity,
             child: Center(
               child: _videoController.value.isInitialized
                   ? AspectRatio(
@@ -153,53 +193,89 @@ class _DashboardPageState extends State<DashboardPage> {
                     ), // Loading indicator
             ),
           ),
-
-          // Info Perusahaan
-          Row(
-            children: [
-              const Icon(
-                Icons.business_center,
-                color: komatsuBlue,
-                size: 24,
-              ), // Placeholder Logo
-              const SizedBox(width: 8),
-              Text(
-                'KOMATSU',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: komatsuBlue,
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 16.0,
+            ),
+            color: Colors.grey.shade100,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Image(
+                          image: AssetImage('assets/images/logo/komatsu.png'),
+                          height: 24,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          data.clusterName,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: primaryTextColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () {
+                        // open bottom sheet wegets/bottom_sheet.dart
+                        MyBottomSheet.show(
+                          context,
+                          title: 'Change Sites',
+                          content: const Text(
+                            'Content for changing sites goes here.',
+                          ),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          const Text(
+                            'Change Sites',
+                            style: TextStyle(color: komatsuBlue, fontSize: 14),
+                          ),
+                          const SizedBox(width: 4),
+                          SvgPicture.asset(
+                            'assets/svg/change.svg',
+                            height: 16,
+                            width: 16,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const Spacer(),
-              TextButton(
-                onPressed: () {
-                  // Navigasi ke halaman Edit Site/Cluster
-                },
-                child: const Text(
-                  'Change Sites',
-                  style: TextStyle(color: komatsuBlue, fontSize: 14),
+                const SizedBox(height: 8),
+                // Nama & Alamat Situs
+                Text(
+                  data.siteName,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: primaryTextColor,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-
-          // Nama & Alamat Situs
-          Text(
-            data.siteName,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: primaryTextColor,
+                const SizedBox(height: 4),
+                Text(
+                  'SN: 12345678901234567890',
+                  style: TextStyle(fontSize: 13, color: secondaryTextColor),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  data.siteAddress,
+                  style: TextStyle(fontSize: 13, color: secondaryTextColor),
+                ),
+                const SizedBox(height: 16),
+              ],
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            data.siteAddress,
-            style: TextStyle(fontSize: 13, color: secondaryTextColor),
-          ),
-          const SizedBox(height: 16),
+          // Info Perusahaan
         ],
       ),
     );
@@ -219,13 +295,11 @@ class _DashboardPageState extends State<DashboardPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Current Load',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: primaryTextColor,
-                  ),
+                const TextInfoWithIcon(
+                  title: 'Current Load',
+                  size: 16,
+                  description:
+                      'The real-time electrical load being used at the moment.',
                 ),
                 Row(
                   children: [
@@ -250,6 +324,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
               ],
             ),
+            const Divider(height: 24, thickness: 0.5, color: Colors.grey),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -302,13 +377,11 @@ class _DashboardPageState extends State<DashboardPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Current Power',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: primaryTextColor,
-                  ),
+                const TextInfoWithIcon(
+                  title: 'Current Power',
+                  size: 16,
+                  description:
+                      'The total electrical power currently being produced or supplied from all energy sources in real time.',
                 ),
                 Row(
                   children: [
@@ -333,8 +406,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
               ],
             ),
+            const Divider(height: 24, thickness: 0.5, color: Colors.grey),
             const SizedBox(height: 16),
-
             // Grid 2x4 untuk Power Sources
             GridView.count(
               crossAxisCount: 2,
@@ -346,59 +419,51 @@ class _DashboardPageState extends State<DashboardPage> {
               children: [
                 // Source 1: PV
                 KeyValueItem(
-                  label: 'PV Output',
-                  value: '0.320 kW',
-                  icon: Icons.wb_sunny,
-                  valueColor: accentGreen,
+                  label: 'VAWT',
+                  value: '0.320',
+                  icon: 'assets/svg/vawt.svg',
                 ),
                 // Source 2: PV from HVDS Tower
                 KeyValueItem(
-                  label: 'PV from HVDS Tower',
-                  value: '1.100 kW',
-                  icon: Icons.wifi,
-                  valueColor: accentGreen,
+                  label: 'Flex PV HRES Tower',
+                  value: '1.100',
+                  icon: 'assets/svg/flex-pv.svg',
                 ),
                 // Source 3: Bus Tracking System
                 KeyValueItem(
-                  label: 'Bus Tracking System',
-                  value: '0.282 kW',
-                  icon: Icons.directions_bus,
-                  valueColor: accentGreen,
+                  label: 'Sun Tracking System',
+                  value: '0.282',
+                  icon: 'assets/svg/sun-tracking-system.svg',
                 ),
-                // Source 4: Battery Package
+                // Source 4: Solar Rooftop
                 KeyValueItem(
-                  label: 'Battery Package',
-                  value: '6.520 kW',
-                  icon: Icons.battery_charging_full,
-                  valueColor: accentGreen,
+                  label: 'Solar Rooftop',
+                  value: '0.347',
+                  icon: 'assets/svg/solar-rooftop.svg',
                 ),
-                // Source 5: Electricity
+                // Source 5: Perovskite
                 KeyValueItem(
-                  label: 'Electricity',
-                  value: '0.490 kW',
-                  icon: Icons.bolt,
-                  valueColor: accentGreen,
+                  label: 'Perovskite',
+                  value: '0.490',
+                  icon: 'assets/svg/perovskite.svg',
                 ),
                 // Source 6: Wall Mounted Flex PV
                 KeyValueItem(
                   label: 'Wall Mounted Flex PV',
-                  value: '1.520 kW',
-                  icon: Icons.power,
-                  valueColor: accentGreen,
+                  value: '1.520',
+                  icon: 'assets/svg/wall-mounted.svg',
                 ),
-                // Source 7: Primary
+                // Source 7: Battery
                 KeyValueItem(
-                  label: 'Primary',
-                  value: '0.347 kW',
-                  icon: Icons.star,
-                  valueColor: accentRed,
+                  label: 'Battery',
+                  value: '6.520',
+                  icon: 'assets/svg/battery.svg',
                 ),
                 // Source 8: Grid PLM
                 KeyValueItem(
                   label: 'Grid PLM',
-                  value: '0.436 kW',
-                  icon: Icons.grid_on,
-                  valueColor: accentRed,
+                  value: '0.436',
+                  icon: 'assets/svg/grid-pln.svg',
                 ),
               ],
             ),
@@ -417,15 +482,13 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Load Supply Today',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: primaryTextColor,
-              ),
+            const TextInfoWithIcon(
+              title: 'Load Supply Today',
+              size: 16,
+              description:
+                  'The total amount of energy (kWh) supplied to the load throughout the day from all energy sources.',
             ),
             const SizedBox(height: 16),
             const Text(
@@ -439,7 +502,11 @@ class _DashboardPageState extends State<DashboardPage> {
             const SizedBox(height: 4),
             Text(
               'Total Supply Energy',
-              style: TextStyle(fontSize: 13, color: secondaryTextColor),
+              style: TextStyle(
+                fontSize: 13,
+                color: primaryTextColor,
+                fontFamily: 'GeistRegular',
+              ),
             ),
             // Anda dapat menambahkan placeholder chart di sini jika diperlukan
           ],
@@ -478,15 +545,9 @@ class _DashboardPageState extends State<DashboardPage> {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      CircularProgressIndicator(
-                        value: 1.0, // Full
-                        strokeWidth: 8,
-                        backgroundColor: Colors.grey.shade200,
-                        valueColor: AlwaysStoppedAnimation<Color>(accentGreen),
-                      ),
-                      const Text(
-                        '100%',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ReusablePieChartWithIcon(
+                        radius: 40,
+                        activeColor: accentGreen,
                       ),
                     ],
                   ),
@@ -513,12 +574,16 @@ class _DashboardPageState extends State<DashboardPage> {
               ],
             ),
             const SizedBox(height: 16),
-
             // Detail Baterai (Tabel)
             _buildBatteryDetailRow('Status', 'Full Charged', accentGreen),
             _buildBatteryDetailRow(
-              'Daily Charging Volume',
+              'Day Charging Volume',
               '29 kWh',
+              primaryTextColor,
+            ),
+            _buildBatteryDetailRow(
+              'Daily Discharging Volume',
+              '72 kWh',
               primaryTextColor,
             ),
             _buildBatteryDetailRow(
@@ -546,13 +611,18 @@ class _DashboardPageState extends State<DashboardPage> {
         children: [
           Text(
             label,
-            style: TextStyle(fontSize: 14, color: secondaryTextColor),
+            style: TextStyle(
+              fontSize: 14,
+              color: primaryTextColor,
+              fontFamily: 'GeistRegular',
+            ),
           ),
           Text(
             value,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
+              fontFamily: 'GeistRegular',
               color: valueColor,
             ),
           ),
@@ -565,68 +635,135 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildCarbonReductionPanel() {
     return Card(
       elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ), // Sudut lebih membulat (16)
       margin: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Carbon Reduction Today',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: primaryTextColor,
-              ),
-            ),
-            const SizedBox(height: 16),
-
+            // ===================================================================
+            // 1. ROW JUDUL UTAMA & NILAI HARI INI (Top Row)
+            // ===================================================================
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '62 kg',
+                  'Carbon Reduction Today',
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                    fontWeight:
+                        FontWeight.w600, // Sedikit lebih ringan dari bold
                     color: primaryTextColor,
                   ),
                 ),
                 Text(
-                  '6.85 kg',
+                  '5.85 kg', // Nilai ini datang dari sisi kanan desain
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    color: accentGreen,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: primaryTextColor,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 4),
+
+            const SizedBox(height: 16),
+
+            // ===================================================================
+            // 2. DUA KARTU INFO BAWAH JUDUL (Total Reduction & Total Revenue)
+            // ===================================================================
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start, // Align to top
               children: [
-                Text(
-                  'Total Carbon Reduction',
-                  style: TextStyle(fontSize: 13, color: secondaryTextColor),
+                // --- Kiri: Total Carbon Reduction ---
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          TextInfoWithIcon(
+                            title: 'Total Carbon Reduction',
+                            size: 13,
+                            description:
+                                'The total carbon reduction achieved today through energy savings and renewable sources.',
+                            textColor: secondaryTextColor,
+                            iconColor: secondaryTextColor,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '12 kg', // Nilai Carbon Reduction
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: primaryTextColor,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                Text(
-                  'Total Revenue 124.790.212 IDR',
-                  style: TextStyle(fontSize: 13, color: secondaryTextColor),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          TextInfoWithIcon(
+                            title: 'Total Revenue',
+                            size: 13,
+                            description:
+                                'The total revenue generated from carbon reduction today.',
+                            textColor: secondaryTextColor,
+                            iconColor: secondaryTextColor,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '123.456.000',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: primaryTextColor,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
 
-            // Placeholder Bar Chart (Simulasi)
-            Container(
-              height: 100,
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
+            const SizedBox(height: 24), // Jarak antara nilai dan chart
+            // ===================================================================
+            // 3. BAR CHART KUSTOM SIMULASI
+            // ===================================================================
+            SizedBox(
+              height: 140, // Batasan tinggi untuk Chart area
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end, // Mulai dari bawah
+                children: [
+                  ReusableBarChart(
+                    data: [
+                      BarData(x: 1, y: 0.4, label: 'Mon'),
+                      BarData(x: 2, y: 0.6, label: 'Tue'),
+                      BarData(x: 3, y: 0.5, label: 'Wed'),
+                      BarData(x: 4, y: 0.8, label: 'Thu'),
+                      BarData(x: 5, y: 0.7, label: 'Fri'),
+                      BarData(x: 6, y: 0.9, label: 'Sat'),
+                      BarData(x: 7, y: 0.3, label: 'Sun'),
+                    ],
+                    maxY: 1.0,
+                    todayColor: accentGreen,
+                    defaultBarColor: primaryTextColor,
+                    inactiveColor: barBackground,
+                  ),
+                ],
               ),
-              child: Center(child: Text('Simulasi Bar Chart Carbon')),
             ),
           ],
         ),
@@ -655,14 +792,12 @@ class _DashboardPageState extends State<DashboardPage> {
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-
       body: CustomScrollView(
         slivers: [
           SliverList(
             delegate: SliverChildListDelegate([
               // 2. Header Situs dan Diagram
               _buildSiteHeaderAndDiagram(context, data),
-
               // 3. Konten Utama Dashboard (Padding luar)
               Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -670,30 +805,20 @@ class _DashboardPageState extends State<DashboardPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     const SizedBox(height: 16),
-
                     // Current Load
                     _buildCurrentLoadPanel(),
-
                     const SizedBox(height: 24),
-
                     // Current Power
                     _buildCurrentPowerPanel(),
-
                     const SizedBox(height: 24),
-
                     // Load Supply Today
                     _buildLoadSupplyPanel(),
-
                     const SizedBox(height: 24),
-
                     // Battery Overview
                     _buildBatteryOverviewPanel(),
-
                     const SizedBox(height: 24),
-
                     // Carbon Reduction Today
                     _buildCarbonReductionPanel(),
-
                     const SizedBox(height: 50),
                   ],
                 ),

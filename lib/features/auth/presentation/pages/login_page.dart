@@ -1,5 +1,4 @@
 import 'package:aerion_dashboard/features/auth/presentation/widgets/button.dart';
-import 'package:aerion_dashboard/features/auth/presentation/widgets/text_link.dart';
 import 'package:aerion_dashboard/features/auth/presentation/widgets/form_field.dart';
 import 'package:aerion_dashboard/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:flutter/material.dart';
@@ -180,15 +179,15 @@ class _LoginPageState extends State<LoginPage> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 10),
-                      // forget password text button
-                      TextLink(
-                        label: 'Forgot password ? ',
-                        linkLabel: 'Click Here',
-                        onPressed: () {
-                          context.go('/forgot-password');
-                        },
-                      ),
+                      // const SizedBox(height: 10),
+                      // // forget password text button
+                      // TextLink(
+                      //   label: 'Forgot password ? ',
+                      //   linkLabel: 'Click Here',
+                      //   onPressed: () {
+                      //     context.go('/forgot-password');
+                      //   },
+                      // ),
                       const SizedBox(height: 32),
                       // use button widget
                       LoginButton(

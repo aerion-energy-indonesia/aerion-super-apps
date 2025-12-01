@@ -52,6 +52,7 @@ dependencies:
   flutter_svg: ^2.2.2
   intl: ^0.20.2
   video_player: ^2.10.1
+  fl_chart: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -153,8 +154,18 @@ flutter:
         - assets/svg/chevron-left.svg
         - assets/svg/eye-open.svg
         - assets/svg/eye-close.svg
+        - assets/svg/vawt.svg
+        - assets/svg/flex-pv.svg
+        - assets/svg/sun-tracking-system.svg
+        - assets/svg/solar-rooftop.svg
+        - assets/svg/perovskite.svg
+        - assets/svg/wall-mounted.svg
+        - assets/svg/battery.svg
+        - assets/svg/change.svg
+        - assets/svg/grid-pln.svg
+        - assets/svg/ic-battery.svg
+        - assets/svg/info.svg
         - assets/videos/super-apps.mp4
-
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf

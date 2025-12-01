@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../themes/app_colors.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class FormFieldWidget extends StatefulWidget {
   final String label;
@@ -92,8 +93,10 @@ class _FormFieldWidgetState extends State<FormFieldWidget> {
             ),
             suffixIcon: widget.isPassword
                 ? IconButton(
-                    icon: Icon(
-                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                    icon: SvgPicture.asset(
+                      _obscureText
+                          ? 'assets/svg/eye-close.svg'
+                          : 'assets/svg/eye-open.svg',
                     ),
                     color: AppColors.textSecondary,
                     onPressed: () {

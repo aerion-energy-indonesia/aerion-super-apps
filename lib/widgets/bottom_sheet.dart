@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:aerion_dashboard/themes/app_colors.dart';
 
 // Definisi Warna
-const Color _kPrimaryTextColor = Color(0xFF364153);
-const Color _kAccentColor = Color(0xFF00305E);
+const Color _kPrimaryTextColor = AppColors.textPrimary;
+// const Color _kAccentColor = AppColors.accent;
 
 /// Fungsi wrapper untuk menampilkan Bottom Sheet modal.
 ///
@@ -13,7 +14,7 @@ const Color _kAccentColor = Color(0xFF00305E);
 ///   description: 'Pilih rentang waktu atau jenis data untuk analisis.',
 ///   content: Column(children: [/* Your custom widgets here */]),
 /// );
-class BottomSheet {
+class MyBottomSheet {
   static Future<T?> show<T>(
     BuildContext context, {
     required String title,
