@@ -743,7 +743,7 @@ class _DashboardPageState extends State<DashboardPage> {
             // 3. BAR CHART KUSTOM SIMULASI
             // ===================================================================
             SizedBox(
-              height: 140, // Batasan tinggi untuk Chart area
+              height: 140,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end, // Mulai dari bawah
                 children: [
