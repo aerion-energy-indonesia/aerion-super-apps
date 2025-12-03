@@ -1,6 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:aerion_dashboard/themes/app_colors.dart';
+// import 'package:aerion_dashboard/widgets/reusable_bar_chart.dart';
+// import 'package:aerion_dashboard/widgets/reusable_pie_chart.dart';
+// import 'package:aerion_dashboard/widgets/reusable_line_chart.dart';
+import 'package:aerion_dashboard/widgets/bottom_sheet.dart';
+import 'package:aerion_dashboard/widgets/time_filter_widgets.dart';
 import 'package:aerion_dashboard/widgets/app_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -28,9 +34,12 @@ class ActivityPage extends StatefulWidget {
 class _ActivityPageState extends State<ActivityPage> {
   late DateTime _currentDateTime;
   Timer? _timer;
+  String _activeTab = 'Day'; // State untuk melacak tab yang aktif
 
   // Warna dan Konstanta
-  static const Color primaryTextColor = Color(0xFF364153);
+  static const Color primaryTextColor = AppColors.textPrimary;
+  static const Color secondaryTextColor = AppColors.textOnSecondary;
+  static const Color primaryBackgroundColor = AppColors.textPrimary;
   static const Color accentBlue = Color(
     0xFF3B82F6,
   ); // Warna biru untuk generation
@@ -166,55 +175,71 @@ class _ActivityPageState extends State<ActivityPage> {
 
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Energy Chart',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: primaryTextColor,
-                ),
+          padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 16.0),
+          child: Container(
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
               ),
-              const SizedBox(height: 8),
-
-              Text(
-                'Total Power 5,818.61 kWh',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  color: primaryTextColor,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Energy Chart',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      color: primaryTextColor,
+                      fontFamily: 'GeistSemiBold',
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      Text(
+                        'Total Power',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: secondaryTextColor,
+                          fontFamily: 'GeistRegular',
+                        ),
+                      ),
+                      Text(
+                        ' 119.816',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                          color: primaryTextColor,
+                          fontFamily: 'GeistSemiBold',
+                        ),
+                      ),
+                      Text(
+                        ' kWh',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: secondaryTextColor,
+                          fontFamily: 'GeistRegular',
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _buildTimeTabs(),
+                  _buildDateNavigatorSection(context),
+                  _buildChartPlaceholder(context),
+                  _buildChartLegend(),
+                  const SizedBox(height: 16),
+                  _buildSummaryCards(),
+                  const SizedBox(height: 24),
+                  _buildLogTable(logData),
+                  const SizedBox(height: 50),
+                ],
               ),
-              const SizedBox(height: 16),
-
-              _buildTimeTabs(),
-
-              _buildChartPlaceholder(context),
-
-              _buildChartLegend(),
-
-              const SizedBox(height: 16),
-
-              _buildSummaryCards(),
-
-              const SizedBox(height: 24),
-
-              const Text(
-                'Activity Log Details',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: primaryTextColor,
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              _buildLogTable(logData),
-              const SizedBox(height: 50),
-            ],
+            ),
           ),
         ),
       ),
@@ -225,32 +250,40 @@ class _ActivityPageState extends State<ActivityPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.grey[200],
         borderRadius: BorderRadius.circular(10),
         boxShadow: [BoxShadow(color: Colors.grey.shade200, blurRadius: 5)],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: ['Day', 'Month', 'Year'].map((label) {
-          bool isActive = label == 'Day';
+          bool isActive = label == _activeTab; // Gunakan _activeTab
           return Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 4.0),
               child: TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  setState(() {
+                    _activeTab =
+                        label; // Perbarui _activeTab saat tombol ditekan
+                  });
+                },
                 style: TextButton.styleFrom(
                   backgroundColor: isActive
-                      ? accentBlue.withOpacity(0.1)
+                      ? primaryBackgroundColor.withOpacity(0.8)
                       : Colors.transparent,
                   shape: RoundedRectangleBorder(
+                    // Menggunakan RoundedRectangleBorder
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
                 child: Text(
                   label,
                   style: TextStyle(
-                    color: isActive ? accentBlue : primaryTextColor,
-                    fontWeight: FontWeight.bold,
+                    color: isActive ? Colors.white : primaryTextColor,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'GeistRegular',
                   ),
                 ),
               ),
@@ -258,6 +291,33 @@ class _ActivityPageState extends State<ActivityPage> {
           );
         }).toList(),
       ),
+    );
+  }
+
+  Widget _buildDateNavigatorSection(BuildContext context) {
+    // Simulasi state
+    final String currentDisplay = '01 Sept 2025 - 12:35:12 PM';
+
+    return DateNavigator(
+      type: TimeFilterType.day,
+      currentValue: currentDisplay,
+      onBackward: () => print('Backward Nav clicked'),
+      onForward: () => print('Forward Nav clicked'),
+      onDropdownTap: () {
+        // Tampilkan Bottom Sheet Filter Hari
+        MyBottomSheet.show(
+          context,
+          title: 'Filter Day', // Judul dari desain: Filter Day/Month/Year
+          content: DateFilterModal(
+            type: TimeFilterType.day,
+            onConfirm: (selectedValue) {
+              print('Date Filter Confirmed: $selectedValue');
+            },
+          ),
+          // Karena DateFilterModal sudah memiliki ScrollView internal,
+          // kita bisa atur tinggi yang sesuai di sini.
+        );
+      },
     );
   }
 
