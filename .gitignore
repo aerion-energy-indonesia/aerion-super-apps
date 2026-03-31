@@ -30,7 +30,12 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-/build/
+# Ignore semua dalam folder build
+build/**
+
+# Tapi jangan ignore folder build/web dan isinya
+!build/web/
+!build/web/**
 /coverage/
 
 # Symbolication related

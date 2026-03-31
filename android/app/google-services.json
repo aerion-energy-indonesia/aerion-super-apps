@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "996118329348",
+    "project_id": "aerion-super-apps",
+    "storage_bucket": "aerion-super-apps.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:996118329348:android:aa898d80d3bcf88ce79d51",
+        "android_client_info": {
+          "package_name": "com.aerion"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJKHqh1wlB-1PznYWCNuDWRl8BarsfBhM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

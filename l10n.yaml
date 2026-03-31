@@ -1,0 +1,4 @@
+# l10n.yaml
+arb-dir: lib/l10n
+template-arb-file: app_en.arb # File .arb dasar (template)
+output-localization-file: app_localizations.dart # Nama file output class
